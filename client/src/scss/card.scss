@@ -1,0 +1,190 @@
+@use 'variables.scss' as vars;
+
+
+div {
+    &.card {
+        background: linear-gradient(120deg, rgba(24,28,43,0.82) 0%, rgba(58,110,219,0.18) 100%);
+        backdrop-filter: blur(12px) saturate(1.2);
+        -webkit-backdrop-filter: blur(12px) saturate(1.2);
+        border-radius: 1.2rem;
+        box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+        color: vars.$star-white;
+        border: 1.5px solid rgba(126,196,124,0.12);
+        padding: 2.5rem 2.2rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.97;
+        transition: 
+            background 0.5s cubic-bezier(0.4,0.2,0.2,1),
+            padding 0.3s cubic-bezier(0.4,0.2,0.2,1),
+            margin-bottom 0.3s cubic-bezier(0.4,0.2,0.2,1),
+            opacity 0.3s cubic-bezier(0.4,0.2,0.2,1);
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 85vw;
+        position: relative;
+        overflow: hidden;
+
+        &.card-left {
+            margin-left: 2vw;
+            margin-right: auto;
+
+            &:hover{
+                box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+                background: linear-gradient(120deg, rgba(58,110,219,0.22) 0%, rgba(24,28,43,0.92) 100%);
+                border: 2px solid vars.$primary-blue;
+                transform: scale(1.018) rotate(0.5deg);
+                filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+                animation: cardGlowInLeft 0.5s cubic-bezier(0.22,1,0.36,1);
+            }
+
+            &:not(:hover) {
+                animation: cardGlowOutLeft 0.5s cubic-bezier(0.22,1,0.36,1);
+            }
+
+            // Disable hover/animation on touch devices
+            @media (hover: none) and (pointer: coarse) {
+                &:hover {
+                    background: linear-gradient(120deg, rgba(24,28,43,0.82) 0%, rgba(58,110,219,0.18) 100%);
+                    border: 1.5px solid rgba(126,196,124,0.12);
+                    box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+                    transform: none;
+                    filter: none;
+                    animation: none;
+                }
+                &:not(:hover) {
+                    animation: none;
+                }
+            }
+        }
+
+        &.card-right {
+            margin-right: 2vw;
+            margin-left: auto;
+
+            &:hover {
+                box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+                background: linear-gradient(120deg, rgba(58,110,219,0.22) 0%, rgba(24,28,43,0.92) 100%);
+                border: 2px solid vars.$primary-blue;
+                transform: scale(1.018) rotate(-0.5deg);
+                filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+                animation: cardGlowInRight 0.5s cubic-bezier(0.22,1,0.36,1);
+            }
+
+            &:not(:hover) {
+                animation: cardGlowOutRight 0.5s cubic-bezier(0.22,1,0.36,1);
+            }
+
+            // Disable hover/animation on touch devices
+            @media (hover: none) and (pointer: coarse) {
+                &:hover {
+                    background: linear-gradient(120deg, rgba(24,28,43,0.82) 0%, rgba(58,110,219,0.18) 100%);
+                    border: 1.5px solid rgba(126,196,124,0.12);
+                    box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+                    transform: none;
+                    filter: none;
+                    animation: none;
+                }
+                &:not(:hover) {
+                    animation: none;
+                }
+            }
+        }
+    }
+
+    @keyframes cardGlowInLeft {
+        0% {
+            box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+            border: 1.5px solid rgba(126,196,124,0.12);
+            transform: scale(1) rotate(0deg);
+            filter: brightness(1) drop-shadow(0 0 0 vars.$primary-blue);
+        }
+        100% {
+            box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+            border: 2px solid vars.$primary-blue;
+            transform: scale(1.018) rotate(0.5deg);
+            filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+        }
+    }
+
+    @keyframes cardGlowOutLeft {
+        0% {
+            box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+            border: 2px solid vars.$primary-blue;
+            transform: scale(1.018) rotate(0.5deg);
+            filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+        }
+        100% {
+            box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+            border: 1.5px solid rgba(126,196,124,0.12);
+            transform: scale(1) rotate(0deg);
+            filter: brightness(1) drop-shadow(0 0 0 vars.$primary-blue);
+        }
+    }
+
+    @keyframes cardGlowInRight {
+        0% {
+            box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+            border: 1.5px solid rgba(126,196,124,0.12);
+            transform: scale(1) rotate(0deg);
+            filter: brightness(1) drop-shadow(0 0 0 vars.$primary-blue);
+        }
+        100% {
+            box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+            border: 2px solid vars.$primary-blue;
+            transform: scale(1.018) rotate(-0.5deg);
+            filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+        }
+    }
+
+    @keyframes cardGlowOutRight {
+        0% {
+            box-shadow: 0 4px 12px 0 vars.$primary-blue, 0 3px 9px 0 vars.$shadow;
+            border: 2px solid vars.$primary-blue;
+            transform: scale(1.018) rotate(-0.5deg);
+            filter: brightness(1.03) drop-shadow(0 0 2.5px vars.$primary-blue);
+        }
+        100% {
+            box-shadow: 0 6px 24px 0 rgba(0,0,0,0.16), 0 1.5px 0 vars.$primary-blue;
+            border: 1.5px solid rgba(126,196,124,0.12);
+            transform: scale(1) rotate(0deg);
+            filter: brightness(1) drop-shadow(0 0 0 vars.$primary-blue);
+        }
+    }
+}
+
+// Mobile responsive styles
+@media (max-width: vars.$mobile-breakpoint) {
+    div.card {
+        max-width: 95vw;
+        padding: 1.5rem 1.2rem;
+        margin-bottom: 1.5rem;
+        border-radius: 1rem;
+        table {
+            width: 100% !important;
+        }
+    }
+    div.card.card-left {
+        margin-left: 2vw;
+        margin-right: 8vw;
+    }
+    div.card.card-right {
+        margin-right: 2vw;
+        margin-left: 8vw;
+    }
+}
+
+@media (max-width: vars.$mobile-small-breakpoint) {
+    div.card {
+        max-width: 98vw;
+        padding: 1rem 0.8rem;
+        margin-bottom: 1rem;
+        border-radius: 0.8rem;
+    }
+    div.card.card-left {
+        margin-left: 1vw;
+    }
+    div.card.card-right {
+        margin-right: 1vw;
+    }
+}

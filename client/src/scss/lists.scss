@@ -1,0 +1,57 @@
+@use 'variables.scss' as vars;
+
+ul {
+    list-style: none;
+    margin: 1.2em 0;
+    padding-left: 0;
+    width: 100%;
+
+    &.alignLeft {
+        margin-left: 2%;
+        margin-right: auto;
+        text-align: left;
+    }
+
+    &.alignRight {
+        margin-right: 2%;
+        margin-left: auto;
+        text-align: right;
+    }
+}
+
+li {
+    position: relative;
+    padding-left: 1.6em;
+    margin-bottom: 0.6em;
+    color: vars.$star-white;
+    font-family: 'Mulish', 'Bellota Text', sans-serif;
+    font-size: 1.08em;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+    text-align: left;
+}
+
+ul li::before {
+    content: "";
+    position: absolute;
+    left: 0.2em;
+    top: 50%;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    background: linear-gradient(135deg, vars.$primary-blue 0%, vars.$accent-ring 100%);
+    box-shadow: 0 1px 4px vars.$shadow;
+    opacity: 0.85;
+    transform: translateY(-50%);
+}
+
+ul.alignRight li {
+    text-align: right;
+    padding-left: 0;
+    padding-right: 1.6em;
+}
+
+ul.alignRight li::before {
+    left: auto;
+    right: 0.2em;
+}

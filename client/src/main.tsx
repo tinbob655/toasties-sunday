@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router';
+import './scss/main.scss';
 
 import Header from './components/multiPageComponents/header';
 import AllRoutes from './routes';

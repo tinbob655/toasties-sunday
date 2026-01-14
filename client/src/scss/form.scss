@@ -1,0 +1,201 @@
+@use 'variables.scss' as vars;
+
+textarea {
+    background: rgba(vars.$primary-bg, 0.7);
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.12), 0 1.5px 4px 0 vars.$shadow;
+    border: 1.5px solid vars.$star-white;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    color: vars.$earth-green;
+    font-family: "Mulish";
+    margin-top: 0;
+    padding: 7px 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    outline: none;
+    width: 75%;
+    min-height: 90px;
+    backdrop-filter: blur(6px);
+    font-size: 0.98rem;
+    letter-spacing: 0.02em;
+    resize: vertical;
+    transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, transform 0.3s;
+    &::placeholder {
+        color: vars.$star-white;
+        opacity: 0.7;
+        font-style: italic;
+    }
+
+    &:hover, &:focus {
+        transform: scale(1.02);
+        background: rgba(vars.$primary-bg, 0.95);
+        border-color: vars.$accent-ring;
+        box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 2px 8px 0 vars.$accent-ring;
+    }
+}
+
+input {
+    background: rgba(vars.$primary-bg, 0.7);
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.12), 0 1.5px 4px 0 vars.$shadow;
+    border: 1.5px solid vars.$star-white;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    color: vars.$earth-green;
+    font-family: "Mulish";
+    margin-top: 0;
+    padding: 7px 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    outline: none;
+    width: 65%;
+    backdrop-filter: blur(6px);
+    font-size: 0.98rem;
+    letter-spacing: 0.02em;
+    transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, transform 0.3s;
+
+    // Hide the ugly default file input
+    &[type="file"] {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    &[type="submit"] {
+        $paddingLeftRight: 30px;
+        padding-left: $paddingLeftRight;
+        padding-right: $paddingLeftRight;
+        width: fit-content;
+    }
+
+    &::placeholder {
+        color: vars.$star-white;
+        opacity: 0.7;
+        font-style: italic;
+    }
+
+    &:hover, &:focus {
+        transform: scale(1.04);
+        background: rgba(vars.$primary-bg, 0.95);
+        border-color: vars.$accent-ring;
+        box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 2px 8px 0 vars.$accent-ring;
+    }
+}
+
+// Custom file input label
+label {
+
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+
+    &.fileInput {
+        background: rgba(30, 34, 44, 0.7);
+        color: vars.$star-white;
+        font-family: "Mulish";
+        font-size: 1rem;
+        border: 1.5px solid #6cf;
+        border-radius: 8px;
+        padding: 7px 18px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px 0 vars.$shadow;
+        cursor: pointer;
+        transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+        text-align: center;
+        margin-top: 6px;
+        font-weight: 600;
+        min-width: 160px;
+        width: fit-content;
+        letter-spacing: 0.02em;
+
+
+        &:hover, &:focus {
+            transform: scale(1.04);
+            background: rgba(vars.$primary-bg, 0.95);
+            border-color: vars.$accent-ring;
+            box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 2px 8px 0 vars.$accent-ring;
+        }
+    }
+}
+
+
+p.aboveInput {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    margin-top: 40px;
+}
+
+// Mobile responsive styles
+@media (max-width: vars.$mobile-breakpoint) {
+    textarea {
+        width: 90%;
+        min-height: 80px;
+        font-size: 1rem;
+        padding: 10px 14px;
+        transform: unset !important;
+    }
+
+    input {
+        width: 85%;
+        font-size: 1rem;
+        padding: 10px 14px;
+        transform: none !important;
+
+        &[type="submit"] {
+            padding-left: 25px;
+            padding-right: 25px;
+            min-height: 44px;
+        }
+    }
+
+    label.fileInput {
+        min-width: 140px;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        transform: none !important;
+    }
+
+    p.aboveInput {
+        margin-top: 25px;
+    }
+}
+
+@media (max-width: vars.$mobile-small-breakpoint) {
+    textarea {
+        width: 95%;
+        min-height: 70px;
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        transform: none !important;
+    }
+
+    input {
+        width: 92%;
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        transform: none !important;
+
+        &[type="submit"] {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    }
+
+    label.fileInput {
+        min-width: 120px;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        transform: none !important;
+    }
+
+    p.aboveInput {
+        margin-top: 20px;
+    }
+}

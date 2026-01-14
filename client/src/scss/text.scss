@@ -1,0 +1,156 @@
+@use 'variables.scss' as vars;
+
+h1 {
+    font-family: "Bellota Text";
+    font-size: 50px;
+    font-weight: 900;
+    color: vars.$primary-blue;
+    text-shadow: 0 2px 8px vars.$shadow;
+
+    &.pageHeaderTitle {
+        font-family: "Bellota Text", sans-serif;
+        font-size: 3.2rem;
+        font-weight: 900;
+        color: vars.$primary-blue;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 8px vars.$shadow;
+        letter-spacing: 1.2px;
+    }
+}
+
+h2 {
+    font-family: "Bellota Text";
+    font-size: 35px;
+    font-weight: 500;
+    color: vars.$earth-green;
+    text-shadow: 0 1px 4px vars.$shadow;
+}
+
+h3 {
+    font-family: "Mulish";
+    font-size: 22.5px;
+    font-weight: 600;
+    color: vars.$accent-ring;
+    letter-spacing: 0.5px;
+
+    transition-property: transform;
+    transition-duration: 0.75s;
+    transition-timing-function: ease;
+
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+}
+
+p {
+    font-family: "Mulish";
+    font-size: 17.5px;
+    font-weight: lighter;
+    color: vars.$star-white;
+    line-height: 1.7;
+
+    &.fancy {
+        background: rgba(24,28,43,0.55);
+        border-radius: 0.7em;
+        padding: 1.1em 1.5em;
+        box-shadow: 0 2px 8px 0 rgba(58,110,219,0.10);
+        margin-bottom: 1.5em;
+        backdrop-filter: blur(4px) saturate(1.1);
+        -webkit-backdrop-filter: blur(4px) saturate(1.1);
+        border: 1px solid rgba(126,196,124,0.10);
+        opacity: 0.98;
+    }
+
+    &.errorText {
+        color: #f55a5a;
+        font-weight: bold;
+        font-family: monospace;
+    };
+}
+
+
+h1, h2, h3, p {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80vw;
+
+    &.alignLeft {
+        text-align: left;
+        margin-left: 2%;
+        transform-origin: left;
+    }
+
+    &.alignRight {
+        text-align: right;
+        margin-right: 2%;
+        transform-origin: right;
+    }
+}
+
+// Mobile responsive styles
+@media (max-width: vars.$mobile-breakpoint) {
+    h1 {
+        font-size: 36px;
+
+        &.pageHeaderTitle {
+            font-size: 2.2rem;
+        }
+    }
+
+    h2 {
+        font-size: 26px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    p {
+        font-size: 15px;
+        line-height: 1.6;
+
+        &.fancy {
+            padding: 0.8em 1em;
+            margin-bottom: 1em;
+        }
+    }
+
+    h1, h2, h3, p {
+        max-width: 95vw;
+
+        &.alignLeft, &.alignRight {
+            text-align: left;
+            margin-left: 3%;
+            margin-right: 3%;
+        }
+    }
+}
+
+@media (max-width: vars.$mobile-small-breakpoint) {
+    h1 {
+        font-size: 28px;
+
+        &.pageHeaderTitle {
+            font-size: 1.8rem;
+        }
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 14px;
+        line-height: 1.5;
+
+        &.fancy {
+            padding: 0.6em 0.8em;
+        }
+    }
+}

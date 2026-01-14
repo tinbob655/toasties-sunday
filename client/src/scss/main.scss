@@ -1,0 +1,255 @@
+// Better Server Colour Scheme
+@use 'variables.scss' as vars;
+@use 'text.scss';
+@use 'footer.scss';
+@use 'header.scss';
+@use 'loginPopup.scss';
+@use 'fancyButton.scss';
+@use 'pageHeader.scss';
+@use 'card.scss';
+@use 'form.scss';
+@use 'lists.scss';
+@import url('https://fonts.googleapis.com/css2?family=Bellota+Text:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+
+body {
+	min-height: 100vh;
+	background: linear-gradient(135deg, vars.$secondary-bg 0%, vars.$primary-bg 100%);
+	background-color: vars.$primary-bg;
+	color: vars.$star-white;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+div {
+
+    &.dividerLine {
+        width: 75%;
+        height: 2.5px;
+        background: linear-gradient(90deg, vars.$primary-blue 0%, vars.$accent-ring 100%);
+        border-radius: 2px;
+        box-shadow: 0 2px 8px vars.$shadow;
+        opacity: 0.85;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    &#content {
+        margin-top: 110px;
+        padding-top: 18px;
+        transition: margin-top 0.3s, padding-top 0.3s;
+    }
+
+    &.popupWrapper {
+        
+        // Custom scrollbar styling
+        $margin: 10px;
+        &::-webkit-scrollbar {
+            width: 10px;
+            background: transparent;
+            border-radius: $margin;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, rgba(vars.$accent-ring, 0.22) 0%, rgba(vars.$primary-blue, 0.18) 100%);
+            border-radius: $margin;
+            box-shadow: none;
+            border: 2px solid transparent;
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            margin-top: $margin;
+            margin-bottom: $margin;
+            border-radius: $margin;
+        }
+        // Add padding to ensure thumb never touches the top/bottom
+        padding-top: $margin;
+        padding-bottom: $margin;
+        &::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, rgba(vars.$primary-blue, 0.22) 0%, rgba(vars.$accent-ring, 0.18) 100%);
+        }
+        &::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+        z-index: 99;
+        position: fixed;
+        display: block;
+        min-width: 50vw;
+        max-height: 90vh;
+        overflow-y: scroll;
+        opacity: 0;
+        pointer-events: none;
+        max-width: 90vw;
+        background: rgba(vars.$secondary-bg, 0.85);
+        border-radius: 24px;
+        $paddingLeftRight: 38px;
+        padding-left: $paddingLeftRight;
+        padding-right: $paddingLeftRight;
+        border: 2.5px solid rgba(vars.$accent-ring, 0.25);
+
+        //make the popup centred
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.92);
+        transform-origin: 50% 50%;
+        transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s, background 0.4s, opacity 0.4s;
+
+        &.shown {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 8px 24px 0 rgba(0,0,0,0.18), 0 2px 8px 0 vars.$accent-ring, 0 0 8px 2px vars.$accent-ring;
+            background: rgba(vars.$secondary-bg, 0.97);
+        }
+
+        &::before {
+            content: "";
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            pointer-events: none;
+            opacity: 0.12;
+            z-index: 1;
+            clip-path: inset(0 round 24px);
+        }
+    }
+
+}
+
+button {
+    background-color: transparent;
+    border: none;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 80vh;
+    max-width: 50vw;
+
+    &.logo {
+        background: none;
+        color: vars.$primary-blue;
+        filter: drop-shadow(0 2px 8px vars.$shadow);
+        border-radius: 2%;
+    }
+
+    &.button {
+        width: 30px;
+        height: auto;
+        background-color: transparent;
+
+        transition-property: transform;
+        transition-duration: 0.25s;
+        transition-timing-function: ease;
+
+        &:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+    }
+
+    &.rounded {
+        border-radius: 50%;
+        border: 3px solid vars.$accent-ring;
+    }
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+iframe {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    border: 2px solid vars.$secondary-bg;
+    border-radius: 20px;
+}
+
+.noVerticalSpacing {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+// Mobile responsive styles
+@media (max-width: vars.$mobile-breakpoint) {
+    div {
+        &#content {
+            margin-top: 80px;
+            padding-top: 12px;
+        }
+
+        &.popupWrapper {
+            min-width: 92vw;
+            max-width: 96vw;
+            max-height: 85vh;
+            padding-left: 16px;
+            padding-right: 16px;
+            border-radius: 18px;
+        }
+
+        &.dividerLine {
+            width: 90%;
+        }
+    }
+
+    img {
+        max-width: 90vw;
+        max-height: 50vh;
+
+        &.logo {
+            max-width: 85vw;
+        }
+
+        &.button {
+            width: 36px;
+        }
+    }
+
+    table {
+        table-layout: auto;
+    }
+
+    iframe {
+        max-width: 95vw;
+    }
+}
+
+@media (max-width: vars.$mobile-small-breakpoint) {
+    div {
+        &#content {
+            margin-top: 70px;
+            padding-top: 8px;
+        }
+
+        &.popupWrapper {
+            min-width: 80vw;
+            max-width: 88vw;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 14px;
+        }
+    }
+
+    img {
+        max-width: 95vw;
+
+        &.button {
+            width: 32px;
+        }
+    }
+}

@@ -1,0 +1,67 @@
+@use 'variables.scss' as vars;
+
+
+h3.fancyButtonText {
+    letter-spacing: 1.3px;
+    padding: 4px 22px;
+    margin: 0 8px 8px 8px;
+    display: inline-block;
+    border-radius: 8px;
+    background: rgba(24,28,43,0.55);
+    color: vars.$star-white;
+    box-shadow: 0 2px 8px 0 rgba(58,110,219,0.10);
+    font-weight: 800;
+    font-size: 1.18em;
+    border: 1.5px solid transparent;
+    transition: color 0.22s, background 0.22s, border 0.22s, box-shadow 0.22s, transform 0.4s;
+    cursor: pointer;
+
+    &:hover {
+        background: linear-gradient(90deg, vars.$primary-blue 0%, vars.$accent-ring 100%);
+        color: vars.$earth-green;
+        border: 1.5px solid vars.$earth-green;
+        box-shadow: 0 4px 16px 0 vars.$shadow;
+        transform: scale(1.13) translateY(-2px);
+        text-shadow: 0 2px 8px vars.$shadow;
+    }
+}
+
+// Mobile responsive styles
+@media (max-width: vars.$mobile-breakpoint) {
+    h3.fancyButtonText {
+        font-size: 0.95em;
+        padding: 6px 4px;
+        margin: 0 4px 6px 4px;
+        letter-spacing: 0.8px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        // Disable hover effects on touch devices
+        @media (hover: none) and (pointer: coarse) {
+            &:hover {
+                background: rgba(24,28,43,0.55);
+                color: inherit;
+                border: none;
+                box-shadow: none;
+                transform: none;
+                text-shadow: none;
+            }
+        }
+    }
+}
+
+@media (max-width: vars.$mobile-small-breakpoint) {
+    h3.fancyButtonText {
+        font-size: 0.85em;
+        padding: 5px 10px;
+        margin: 0 2px 4px 2px;
+        letter-spacing: 0.5px;
+        min-height: 36px;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}
