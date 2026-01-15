@@ -8,7 +8,7 @@ export default function Footer():React.ReactElement {
             <div id="footer">
                 <img src="/logo.png" className="logo" style={{height: '400px'}} />
                 <p>
-                    Website created by <a href="https://github.com/tinbob655" style={{textDecoration: 'underline'}}>Tinbob655</a> for the Better Server community.
+                    Website created by <a href="https://github.com/tinbob655" style={{textDecoration: 'underline'}}>Tinbob655</a> in the name of amazing toasties!
                 </p>
             </div>
         </React.Fragment>
