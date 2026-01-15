@@ -2,6 +2,7 @@
 const { Sequelize } = require('sequelize');
 
 let sequelize;
+console.log(process.env.NODE_ENV, process.env.MYSQL_URL);
 if (process.env.NODE_ENV === 'production') {
   sequelize = new Sequelize(process.env.MYSQL_URL, {
     dialect: 'mysql',
