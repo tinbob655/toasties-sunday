@@ -1,0 +1,12 @@
+{
+    "name": "toasty-sunday",
+    "scripts": {
+      "dev:client": "cd client && npm run dev",
+      "dev:server": "cd api && npm run dev",
+      "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+      "build": "cd client && npm install && npm run build"
+    },
+    "devDependencies": {
+      "concurrently": "^8.0.0"
+    }
+  }
