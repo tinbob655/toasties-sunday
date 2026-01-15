@@ -1,12 +1,22 @@
+// Load environment variables FIRST
+require('dotenv').config();
+
 // Ensure database tables are created
 const sequelize = require('./sequelize');
+const SequelizeStore = require('connect-session-sequelize')(require('express-session').Store);
 sequelize.sync();
+
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-require('dotenv').config();
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+
+// Use Sequelize for session storage (works with MySQL on Railway)
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+});
+sessionStore.sync();
+
 const app = express();
 
 const bodyParser = require('body-parser');
@@ -25,7 +35,7 @@ app.use(express.json());
 const sessionLengthDays = 7;
 const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
-  store: new SQLiteStore({db: 'sessions.sqlite', dir: './db'}),
+  store: sessionStore,
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
