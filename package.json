@@ -2,6 +2,7 @@
   "name": "toasties-sunday-root",
   "private": true,
   "scripts": {
-    "postinstall": "cd client && npm install && npm run build"
+    "postinstall": "cd client && npm install && npm run build",
+    "start": "npm --prefix server start"
   }
 }
