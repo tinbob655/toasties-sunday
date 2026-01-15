@@ -22,7 +22,6 @@ async function createAccount(username:string, password:string):Promise<accountOb
     const formData = new FormData();
     formData.append('username', username);
     formData.append('password', password);
-    console.log(username, password);
     
     const res = (await axios.post('/api/db/account/createAccount', formData, {withCredentials: true})).data;
     return res;

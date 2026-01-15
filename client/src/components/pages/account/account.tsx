@@ -43,7 +43,6 @@ export default function Account():React.ReactElement {
 
             //close the popup on success
             document.getElementById('loginPopupWrapper')?.classList.remove('shown');
-            console.log('done');
             setTimeout(() => {
                 setLoginPopup(<></>);
             }, 1000);
