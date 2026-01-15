@@ -39,4 +39,14 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/db/order/getOrders - get all orders
+router.get('/getOrders', async (req, res) => {
+  try {
+    const orders = await Purchase.findAll();
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
