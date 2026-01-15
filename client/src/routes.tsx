@@ -7,6 +7,7 @@ import Home from './components/pages/home/home';
 import Account from './components/pages/account/account';
 import Menu from './components/pages/menu/menu';
 import Orders from './components/pages/orders/orders';
+import Admin from './components/pages/admin/admin';
 
 export default function AllRoutes():React.ReactElement {
 
@@ -25,6 +26,7 @@ function getRoutes():React.ReactElement[] {
         ['account', <Account/>],
         ['menu', <Menu/>],
         ['orders', <Orders/>],
+        ['admin', <Admin/>],
     ];
 
     //generate routes
