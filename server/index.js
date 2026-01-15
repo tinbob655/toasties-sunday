@@ -1,3 +1,6 @@
+// Ensure database tables are created
+const sequelize = require('./sequelize');
+sequelize.sync();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');

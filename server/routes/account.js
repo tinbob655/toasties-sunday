@@ -1,14 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {Sequelize, Model, DataTypes} = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../sequelize');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const upload = multer();
 
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './db/account.sqlite',
-});
+
 
 class Account extends Model {};
 Account.init({
@@ -16,7 +14,6 @@ Account.init({
     passwordHash: DataTypes.STRING,
     profilePicture: DataTypes.BLOB,
 }, {sequelize, modelName: 'account'});
-sequelize.sync();
 
 
 //routes
