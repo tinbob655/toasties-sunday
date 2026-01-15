@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {Sequelize, Model, DataTypes} = require('sequelize');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const upload = multer();
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -29,7 +31,7 @@ router.get('/queryLoggedIn', (req, res) => {
 
 
 //create a new account
-router.post('/createAccount', async (req, res) => {
+router.post('/createAccount', upload.none(), async (req, res) => {
     const {username, password} = req.body;
 
     //make sure we have a username, password, and profile picture
@@ -48,7 +50,7 @@ router.post('/createAccount', async (req, res) => {
         if (!validatePassword(password)) {
 
             //password was invalid
-            return res.status(409).json({message: "Password was not valid (must have at least: 5 characters, 1 uppercase character, 1 lowercase character, 1 number and 2 symbol)"});
+            return res.status(409).json({message: "Password was not valid (must have at least: 5 characters, 1 uppercase character, 1 lowercase character, 1 number and 1 symbol)"});
         };
 
         //we are good to go, store the username and a hash of the user's password
