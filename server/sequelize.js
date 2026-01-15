@@ -2,8 +2,7 @@
 const { Sequelize } = require('sequelize');
 
 let sequelize;
-console.log(process.env.NODE_ENV, process.env.MYSQL_URL);
-if (process.env.NODE_ENV === 'production') {
+if (true) {
   sequelize = new Sequelize(process.env.MYSQL_URL, {
     dialect: 'mysql',
     logging: false,
@@ -11,7 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './db/account.sqlite',
+    storage: './db/data.sqlite',
     logging: false,
   });
 }
