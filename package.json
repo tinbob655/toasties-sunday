@@ -1,0 +1,7 @@
+{
+  "name": "toasties-sunday-root",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd client && npm install && npm run build"
+  }
+}
