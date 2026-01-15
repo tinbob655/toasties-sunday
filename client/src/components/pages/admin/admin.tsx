@@ -71,6 +71,7 @@ export default function Admin():React.ReactElement {
                         <p className="alignRight">
                             This weeks orders are:
                         </p>
+                        {ordersHTML}
                     </div>
                 </React.Fragment>
             ) : (

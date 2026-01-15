@@ -22,6 +22,10 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                     Please check the items you will want in your toasty
                 </p>
             </form>
+
+            <p className="errorText">
+                {errorMessage}
+            </p>
         </div>
     );
 };

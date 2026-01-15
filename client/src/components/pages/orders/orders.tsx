@@ -32,6 +32,7 @@ export default function Orders():React.ReactElement {
 
     function orderFormSubmitted(event:React.FormEvent, setErrorMsg: (msg: string) => void) {
         event.preventDefault();
+        setErrorMsg('Not yet implemented');
     };
 
     return (
