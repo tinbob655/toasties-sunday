@@ -1,29 +1,58 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const app = express();
 require('dotenv').config();
+const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
+const app = express();
 
+const bodyParser = require('body-parser');
 
-app.use(cors());
+// Trust first proxy (needed for secure cookies behind reverse proxies)
+app.set('trust proxy', 1);
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(express.json());
+
+//will save login sessions
+const sessionLengthDays = 7;
+const isProduction = process.env.NODE_ENV === 'production';
+app.use(session({
+  store: new SQLiteStore({db: 'sessions.sqlite', dir: './db'}),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: isProduction,
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * sessionLengthDays,
+  }
+}));
 
 
 //serve the frontend
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-//routes
+// routes
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from backend!' });
 });
 
-const db = require('./routes/db');
-app.use('/api/db', db);
+const accountRouter = require('./routes/account');
+app.use('/api/db/account', accountRouter);
+
+const purchaseRouter = require('./routes/purchase');
+app.use('/api/db/order', purchaseRouter);
 
 //fallback will give a page
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
-
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Website running on port ${PORT}`));
