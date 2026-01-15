@@ -1,12 +1,13 @@
 {
-    "rewrites": [
-      {
-        "source": "/api/(.*)",
-        "destination": "/api/api/index.js"
-      },
-      {
-        "source": "/(.*)",
-        "destination": "/"
-      }
-    ]
-  }
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "outputDirectory": "client/dist"
+}
