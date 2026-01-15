@@ -2,8 +2,10 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-app.use(cors());
+require('dotenv').config();
 
+
+app.use(cors());
 
 
 //serve the frontend
@@ -13,6 +15,9 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from backend!' });
 });
+
+const db = require('./routes/db');
+app.use('/api/db', db);
 
 //fallback will give a page
 app.use((req, res) => {
