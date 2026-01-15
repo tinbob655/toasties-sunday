@@ -67,6 +67,10 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'API route not found' });
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Website running on port ${PORT}`));
 

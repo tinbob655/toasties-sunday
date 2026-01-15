@@ -25,27 +25,46 @@ Purchase.init(
   }
 );
 
-// POST /api/db/purchase - create a new purchase
+//create a new order
 router.post('/', async (req, res) => {
   try {
     const { username, items } = req.body;
-    if (!username || !items) {
+
+    //make sure we have a username and at least one item
+    if (!username || !items || items.length < 1) {
       return res.status(400).json({ error: 'username and items are required' });
-    }
+    };
+
     const purchase = await Purchase.create({ username, items });
     res.status(201).json(purchase);
-  } catch (err) {
+  }
+  catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/db/order/getOrders - get all orders
+//get all orders
 router.get('/getOrders', async (req, res) => {
   try {
     const orders = await Purchase.findAll();
     res.json(orders);
-  } catch (err) {
+  }
+  catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+//get a specific order based on username
+router.get('/getOrder/:username', async (req, res) => {
+  try {
+    const order = await Purchase.findByPk(req.params.username);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    res.json(order);
+  }
+  catch(err) {
+    res.status(500).json({error: err.message});
   }
 });
 
