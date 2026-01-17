@@ -23,7 +23,7 @@ export default function OrderCheckboxes({options}:params):React.ReactElement {
                                 </td>
                                 <td style={{width: '80%'}}>
                                     <label htmlFor={option.name}>
-                                        {option.name} for £{option.cost.toFixed(2)}
+                                        {option.name} for £{Number(option.cost).toFixed(2)}
                                     </label>
                                 </td>
                             </tr>

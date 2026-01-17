@@ -16,7 +16,7 @@ export default function SingleCourseMenu({courseData, left}:params):React.ReactE
         courseData.extras.forEach((extra) => {
             tempExtrasHTML.push(
                 <li>
-                    {extra.name} for £{extra.cost.toFixed(2)}
+                    {extra.name} for £{Number(extra.cost).toFixed(2)}
                 </li>
             );
         });
@@ -28,7 +28,7 @@ export default function SingleCourseMenu({courseData, left}:params):React.ReactE
         return (
             <React.Fragment>
                 <p className={alignment}>
-                    For £{courseData.base.baseCost.toFixed(2)} you will get {courseData.base.baseDescription}.
+                    For £{Number(courseData.base.baseCost).toFixed(2)} you will get {courseData.base.baseDescription}.
                     <br/>
                     You may then add any combination of the following:
                 </p>

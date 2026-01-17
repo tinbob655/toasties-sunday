@@ -35,8 +35,6 @@ export default function Orders():React.ReactElement {
                 };
             });
         };
-
-        console.log(userOrder);
     }, [loggedIn]);
 
 
@@ -144,7 +142,7 @@ export default function Orders():React.ReactElement {
                             You have already ordered, {userOrder?.username}!
                         </h2>
                         <p className="alignRight">
-                            The cost of your order is currently: £{userOrder?.cost.toFixed(2)}
+                            The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
                         </p>
                         <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
                         <p className="errorText">
