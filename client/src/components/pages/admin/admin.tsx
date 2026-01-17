@@ -46,7 +46,7 @@ export default function Admin():React.ReactElement {
                             <b>
                                 {order.username}:
                             </b>
-                            {JSON.stringify(order.items)}
+                            {JSON.stringify(order)}
                         </p>
                     </React.Fragment>
                 );
