@@ -80,4 +80,31 @@ router.post('/createNewOrder/:username', async (req, res) => {
   };
 })
 
+
+//delete an order based on username
+router.delete('/deleteOrder/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+
+    //make sure we got a username
+    if (!username) {
+      return res.status(400).json({error: "Did not receive a username"});
+    };
+
+    //delete the order
+    const deleted = await Purchase.destroy({ where: { username } });
+    if (deleted) {
+      return res.status(200).json({});
+    }
+
+    else {
+      return res.status(404).json({error: "Failed to delete order"});
+    };
+  }
+
+  catch (err) {
+    return res.status(500).json({error: err.message});
+  }
+});
+
 module.exports = router;

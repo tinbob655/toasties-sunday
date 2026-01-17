@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
-import { getOrder, placeOrder } from './ordersAPI';
+import { getOrder, placeOrder, deleteOrder } from './ordersAPI';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
@@ -14,17 +14,21 @@ export default function Orders():React.ReactElement {
     const [alreadyOrdered, setAlreadyOrdered] = useState<boolean>(false);
     const [orderPopup, setOrderPopup] = useState<React.ReactElement>(<></>);
     const [userOrder, setUserOrder] = useState<orderObj|null>(null);
+    const [removeOrderError, setRemoveOrderError] = useState<string>('');
 
 
     //see if the user has already placed an order this week
     useEffect(() => {
         if (loggedIn) {
             getOrder(username).then((res) => {
-                console.log(res);
                 if (res) {
 
                     //the user has already made an order
                     setAlreadyOrdered(true);
+                    setUserOrder({
+                        username: res.username,
+                        cost: res.cost,
+                    });
                 }
                 else {
                     setAlreadyOrdered(false);
@@ -109,6 +113,23 @@ export default function Orders():React.ReactElement {
         };
     };
 
+
+    async function removeOrder() {
+        const res:string = await deleteOrder(username);
+
+        //if we manage to delete the order successfully
+        if (res === '') {
+            setAlreadyOrdered(false);
+            setUserOrder(null);
+        }
+        
+        //if we couldn't delete the order
+        else {
+            setRemoveOrderError(res);
+        };
+    };
+
+
     return (
         <React.Fragment>
             <PageHeader title="Orders" subtitle="Get it while its going" />
@@ -120,11 +141,14 @@ export default function Orders():React.ReactElement {
 
                         {/*the user has already ordered, allow them to change their order*/}
                         <h2 className="alignRight">
-                            You have already ordered!
+                            You have already ordered, {userOrder?.username}!
                         </h2>
                         <p className="alignRight">
-                            Here is what you have ordered for this week:
-                            <br/>
+                            The cost of your order is currently: £{userOrder?.cost.toFixed(2)}
+                        </p>
+                        <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
+                        <p className="errorText">
+                            {removeOrderError}
                         </p>
                     </React.Fragment>
                 ) : (

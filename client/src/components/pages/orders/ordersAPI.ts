@@ -39,3 +39,14 @@ export async function placeOrder(cost: number, username: string):Promise<orderOb
         return res;
     };
 };
+
+//delete an order based on username
+export async function deleteOrder(username: string):Promise<string> {
+    const res = await axios.delete(`/api/db/order/deleteOrder/${encodeURIComponent(username)}`);
+    if (res.status === 200) {
+        return '';
+    }
+    else {
+        return res.data.error;
+    };
+}
