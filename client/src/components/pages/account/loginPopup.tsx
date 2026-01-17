@@ -62,9 +62,9 @@ export default function LoginPopup({closeFunc}:params):React.ReactElement {
                     <div id="loginWrapper" ref={loginWrapper} className="formPanel">
                         <form id="loginForm" onSubmit={(event) => {closeFunc(event, 'login', setLoginErrorMsg)}}>
                             <p className="aboveInput">
-                                Enter username:
+                                Enter your name:
                             </p>
-                            <input name="username" type="text" placeholder="Username..." required />
+                            <input name="username" type="text" placeholder="Name..." required />
 
                             <p className="aboveInput">
                                 Enter password:
@@ -82,9 +82,9 @@ export default function LoginPopup({closeFunc}:params):React.ReactElement {
                     <div id="signUpWrapper" ref={signUpWrapper} className="formPanel">
                         <form id="signUpForm" onSubmit={(event) => {closeFunc(event, 'signUp', setSignUpErrorMsg)}}>
                             <p className="aboveInput">
-                                Create username:
+                                Enter your name (please use your actual name so we know who is who):
                             </p>
-                            <input type="text" name="username" placeholder="Username..." required />
+                            <input type="text" name="username" placeholder="Name..." required />
 
                             <p className="aboveInput">
                                 Create password:
