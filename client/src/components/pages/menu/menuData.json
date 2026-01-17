@@ -1,0 +1,52 @@
+{
+    "mainCourse": {
+        "base": {
+            "baseCost": 1.00,
+            "baseDescription": "a single cheese toasty"
+        },
+        "extras": [
+            {
+                "name": "Salami",
+                "cost": 0.2
+            },
+            {
+                "name": "Spring onions",
+                "cost": 0.1
+            }
+        ]
+    },
+
+    "drinks": {
+        "base": {
+            "baseCost": -1,
+            "baseDescription": ""
+        },
+        "extras": [
+            {
+                "name": "Diet coke",
+                "cost": 2.49
+            },
+            {
+                "name": "Coffee",
+                "cost": 0.9
+            }
+        ]
+    },
+
+    "desert": {
+        "base": {
+            "baseCost": 3.00,
+            "baseDescription": "a plain waffle"
+        },
+        "extras": [
+            {
+                "name": "Maple syrup",
+                "cost": 0.3
+            },
+            {
+                "name": "Banana",
+                "cost": 0.5
+            }
+        ]
+    }
+}
