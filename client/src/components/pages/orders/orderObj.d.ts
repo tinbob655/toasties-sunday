@@ -1,4 +1,4 @@
 export interface orderObj {
     username: string,
-    items: string[],
+    cost: number,
 }

@@ -1,7 +1,7 @@
 {
     "mainCourse": {
         "base": {
-            "baseCost": 1.00,
+            "baseCost": 1.1,
             "baseDescription": "a single cheese toasty"
         },
         "extras": [
@@ -11,7 +11,15 @@
             },
             {
                 "name": "Spring onions",
-                "cost": 0.1
+                "cost": 0.15
+            },
+            {
+                "name": "Hot sauce",
+                "cost": 0.15
+            },
+            {
+                "name": "Herbs",
+                "cost": 0.05
             }
         ]
     },
@@ -23,29 +31,33 @@
         },
         "extras": [
             {
-                "name": "Diet coke",
-                "cost": 2.49
+                "name": "Diet coke (can)",
+                "cost": 1.0
             },
             {
-                "name": "Coffee",
-                "cost": 0.9
+                "name": "Coffee (americo)",
+                "cost": 1.20
             }
         ]
     },
 
     "desert": {
         "base": {
-            "baseCost": 3.00,
+            "baseCost": 2.5,
             "baseDescription": "a plain waffle"
         },
         "extras": [
             {
-                "name": "Maple syrup",
-                "cost": 0.3
+                "name": "Syrup",
+                "cost": 0.5
             },
             {
                 "name": "Banana",
-                "cost": 0.5
+                "cost": 0.3
+            },
+            {
+                "name": "Sugar",
+                "cost": 0.1
             }
         ]
     }

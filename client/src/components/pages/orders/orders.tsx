@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
-import { getOrder } from './ordersAPI';
+import { getOrder, placeOrder } from './ordersAPI';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
-import OrderPopup from './orderPopup';
+import OrderPopup from './orderPopup/orderPopup';
+import menuData from '../menu/menuData.json' assert {type: "json"};
+import type { orderObj } from './orderObj';
 
 
 export default function Orders():React.ReactElement {
@@ -11,12 +13,14 @@ export default function Orders():React.ReactElement {
     const {loggedIn, username} = useAuth();
     const [alreadyOrdered, setAlreadyOrdered] = useState<boolean>(false);
     const [orderPopup, setOrderPopup] = useState<React.ReactElement>(<></>);
+    const [userOrder, setUserOrder] = useState<orderObj|null>(null);
 
 
     //see if the user has already placed an order this week
     useEffect(() => {
         if (loggedIn) {
             getOrder(username).then((res) => {
+                console.log(res);
                 if (res) {
 
                     //the user has already made an order
@@ -30,9 +34,77 @@ export default function Orders():React.ReactElement {
     }, [loggedIn]);
 
 
-    function orderFormSubmitted(event:React.FormEvent, setErrorMsg: (msg: string) => void) {
+    async function orderFormSubmitted(event: React.FormEvent, setErrorMsg: (msg: string) => void) {
         event.preventDefault();
-        setErrorMsg('Not yet implemented');
+        const form = event.target as HTMLFormElement;
+
+        const main = (form.elements.namedItem('toggleMainCourse') as HTMLInputElement)?.checked;
+        const drink = (form.elements.namedItem('toggleDrinks') as HTMLInputElement)?.checked;
+        const desert = (form.elements.namedItem('toggleDesert') as HTMLInputElement)?.checked;
+
+        if (!main && !drink && !desert) {
+            setErrorMsg('You must select at least one of a main, drink, or desert.');
+            return;
+        };
+
+        //work out the cost of the user's order
+        let cost: number = 0;
+
+        // Helper to sum extras
+        function sumExtras(form: HTMLFormElement, extras: { name: string, cost: number }[], prefix: string): number {
+            let sum = 0;
+            extras.forEach(extra => {
+                const checkbox = form.elements.namedItem(prefix + extra.name) as HTMLInputElement;
+                if (checkbox && checkbox.checked) {
+                    sum += extra.cost;
+                };
+            });
+            return sum;
+        };
+
+        if (main) {
+            cost += menuData.mainCourse.base.baseCost;
+            cost += sumExtras(form, menuData.mainCourse.extras, '');
+        };
+
+        if (drink) {
+            cost += menuData.drinks.base.baseCost > 0 ? menuData.drinks.base.baseCost : 0;
+            cost += sumExtras(form, menuData.drinks.extras, '');
+        };
+
+        if (desert) {
+            cost += menuData.desert.base.baseCost;
+            cost += sumExtras(form, menuData.desert.extras, '');
+        };
+
+        // Always round cost up to 2 decimal places
+        cost = Math.ceil(cost * 100) / 100;
+
+        
+        //place the order
+        try {
+            const res = await placeOrder(cost, username);
+            setAlreadyOrdered(true);
+            setUserOrder(res);
+
+            //close the popup
+            document.getElementById('orderPopupWrapper')?.classList.remove('shown');
+            setTimeout(() => {
+                setOrderPopup(<></>);
+            }, 1000);
+        }
+        catch (err: any) {
+            let msg = 'An unexpected error occurred.';
+
+            if (typeof err === 'string') {
+                msg = err;
+            } 
+
+            else if (err && typeof err.message === 'string') {
+                msg = err.message;
+            };
+            setErrorMsg(msg);
+        };
     };
 
     return (

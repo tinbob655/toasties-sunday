@@ -87,14 +87,77 @@ input {
         border-color: vars.$accent-ring;
         box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 2px 8px 0 vars.$accent-ring;
     }
+
+    &[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(vars.$primary-bg, 0.7);
+        border: 1.5px solid vars.$star-white;
+        width: 1.15em;
+        height: 1.15em;
+        border-radius: 4px;
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+        margin-right: 0.5em;
+        cursor: pointer;
+        transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+        box-shadow: 0 2px 8px 0 vars.$shadow;
+        outline: none;
+
+        &:checked {
+            background: vars.$accent-ring;
+            border-color: vars.$accent-ring;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 2px vars.$accent-ring, 0 2px 8px 0 vars.$shadow;
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            width: 0.5em;
+            height: 0.25em;
+            border-left: 2.5px solid vars.$star-white;
+            border-bottom: 2.5px solid vars.$star-white;
+            position: absolute;
+            left: 0.25em;
+            top: 0.25em;
+            opacity: 0;
+            transform: rotate(-45deg) scale(0.8);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        &:checked::after {
+            opacity: 1;
+            transform: rotate(-45deg) scale(1);
+        }
+    }
 }
 
 // Custom file input label
 label {
-
     margin-left: auto;
     margin-right: auto;
     display: block;
+
+    // Ensure all direct text and paragraph children look like styled paragraphs
+    color: vars.$star-white;
+    font-family: "Mulish";
+    font-size: 17.5px;
+    font-weight: lighter;
+    line-height: 1.7;
+
+    p {
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        margin: 0;
+        display: inline;
+    }
 
     &.fileInput {
         background: rgba(30, 34, 44, 0.7);
@@ -114,7 +177,6 @@ label {
         min-width: 160px;
         width: fit-content;
         letter-spacing: 0.02em;
-
 
         &:hover, &:focus {
             transform: scale(1.04);

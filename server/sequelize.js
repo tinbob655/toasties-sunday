@@ -7,9 +7,11 @@ if (process.env.MYSQL_URL) {
     dialect: 'mysql',
     logging: false,
   });
-} else if (process.env.NODE_ENV === 'production') {
+}
+else if (process.env.NODE_ENV === 'production') {
   throw new Error('MYSQL_URL environment variable is not set! Cannot start in production without a database.');
-} else {
+}
+else {
   // Local development fallback to SQLite
   sequelize = new Sequelize({
     dialect: 'sqlite',
