@@ -31,6 +31,8 @@ export default function Orders():React.ReactElement {
                 };
             });
         };
+
+        console.log(userOrder);
     }, [loggedIn]);
 
 
