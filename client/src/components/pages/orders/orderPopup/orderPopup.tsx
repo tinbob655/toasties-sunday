@@ -50,7 +50,7 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                                 </td>
                                 <td style={{width: "80%"}}>
                                     <label htmlFor="toggleMainCourse" className="nextToCheckbox">
-                                        I want a toasty (£{menuData.mainCourse.base.baseCost})
+                                        I want a toasty (£{menuData.mainCourse.base.baseCost.toFixed(2)})
                                     </label>
                                 </td>
                             </tr>
@@ -116,7 +116,7 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                                 </td>
                                 <td style={{width: "80%"}}>
                                     <label htmlFor="toggleDesert" className="nextToCheckbox">
-                                        I want a waffle (£{menuData.desert.base.baseCost})
+                                        I want a waffle (£{menuData.desert.base.baseCost.toFixed(2)})
                                     </label>
                                 </td>
                             </tr>
