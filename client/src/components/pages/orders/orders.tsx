@@ -174,12 +174,25 @@ export default function Orders():React.ReactElement {
                         <p className="alignRight">
                             Make sure you order your food for toasties sunday! Orders will close at 13:00 on Sunday and open again at 22:00 that same day
                         </p>
-                        <FancyButton text="Order here!" transformOrigin="left" action={() => {
-                            setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMsg: (msg: string) => void) => {orderFormSubmitted(event, setErrorMsg)}} />);
-                            setTimeout(() => {
-                                document.getElementById('orderPopupWrapper')?.classList.add('shown');
-                            }, 10);  
-                        }} />
+
+                        {loggedIn ? (
+                            <React.Fragment>
+
+                                {/*user is logged in*/}
+                                <FancyButton text="Order here!" transformOrigin="left" action={() => {
+                                    setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMsg: (msg: string) => void) => {orderFormSubmitted(event, setErrorMsg)}} />);
+                                    setTimeout(() => {
+                                        document.getElementById('orderPopupWrapper')?.classList.add('shown');
+                                    }, 10);  
+                                }} />
+                            </React.Fragment>
+                        ) : (
+                            <React.Fragment>
+
+                                {/*user is not logged in*/}
+                                <FancyButton text="You need to be logged in!" transformOrigin="left" destination="/account" />
+                            </React.Fragment>
+                        )}
                     </React.Fragment>
                 )}
             </div>
