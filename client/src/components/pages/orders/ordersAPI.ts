@@ -29,7 +29,7 @@ export async function getOrder(username: string): Promise<orderObj | null> {
 export async function placeOrder(cost: number, username: string):Promise<orderObj> {
     //the user cannot make orders between 13:00 and 21:59 on a Sunday.
     const currentTime: Date = new Date();
-    if (currentTime.getDay() === 0 && currentTime.getHours() >= 25 && currentTime.getHours() < 22) {
+    if (false) {
 
         //invalid time to make an order
         throw new Error("Orders cannot be placed between 1:00 PM and 9:59 PM on Sundays.");
