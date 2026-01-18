@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
-import { getOrder, placeOrder, deleteOrder } from './ordersAPI';
+import { getOrder, placeOrder, deleteOrder, editOrder, extractCost } from './ordersAPI';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
-import menuData from '../menu/menuData.json' assert {type: "json"};
 import type { orderObj } from './orderObj';
 
 
@@ -38,51 +37,11 @@ export default function Orders():React.ReactElement {
     }, [loggedIn]);
 
 
+    //handle the user creating a new order
     async function orderFormSubmitted(event: React.FormEvent, setErrorMsg: (msg: string) => void) {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
-
-        const main = (form.elements.namedItem('toggleMainCourse') as HTMLInputElement)?.checked;
-        const drink = (form.elements.namedItem('toggleDrinks') as HTMLInputElement)?.checked;
-        const desert = (form.elements.namedItem('toggleDesert') as HTMLInputElement)?.checked;
-
-        if (!main && !drink && !desert) {
-            setErrorMsg('You must select at least one of a main, drink, or desert.');
-            return;
-        };
-
-        //work out the cost of the user's order
-        let cost: number = 0;
-
-        // Helper to sum extras
-        function sumExtras(form: HTMLFormElement, extras: { name: string, cost: number }[], prefix: string): number {
-            let sum = 0;
-            extras.forEach(extra => {
-                const checkbox = form.elements.namedItem(prefix + extra.name) as HTMLInputElement;
-                if (checkbox && checkbox.checked) {
-                    sum += extra.cost;
-                };
-            });
-            return sum;
-        };
-
-        if (main) {
-            cost += menuData.mainCourse.base.baseCost;
-            cost += sumExtras(form, menuData.mainCourse.extras, '');
-        };
-
-        if (drink) {
-            cost += menuData.drinks.base.baseCost > 0 ? menuData.drinks.base.baseCost : 0;
-            cost += sumExtras(form, menuData.drinks.extras, '');
-        };
-
-        if (desert) {
-            cost += menuData.desert.base.baseCost;
-            cost += sumExtras(form, menuData.desert.extras, '');
-        };
-
-        // Always round cost up to 2 decimal places
-        cost = Math.ceil(cost * 100) / 100;
+        const cost = extractCost(form, setErrorMsg);
 
         
         //place the order
@@ -112,6 +71,7 @@ export default function Orders():React.ReactElement {
     };
 
 
+    //handle the user deleting their order
     async function removeOrder() {
         const res:string = await deleteOrder(username);
 
@@ -127,6 +87,29 @@ export default function Orders():React.ReactElement {
         };
     };
 
+
+    //handle the user editing their order
+    async function changeOrder(event: React.FormEvent, setErrorMsg: Function) {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const cost = extractCost(form, setErrorMsg);
+
+        //edit the order
+        try {
+            const res = await editOrder(username, cost);
+            console.log(res);
+            setUserOrder(res);
+
+            //close the popup
+            document.getElementById('orderPopupWrapper')?.classList.remove('shown');
+            setTimeout(() => {
+                setOrderPopup(<></>);
+            }, 1000);
+        }
+        catch (err) {
+            setErrorMsg(err);
+        };
+    };
 
     return (
         <React.Fragment>
@@ -145,6 +128,15 @@ export default function Orders():React.ReactElement {
                             The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
                         </p>
                         <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
+
+                        <div style={{marginTop: '20px'}}>
+                            <FancyButton text="Change your order" transformOrigin="left" action={() => {
+                                setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMessage: Function) => {changeOrder(event, setErrorMessage)}} />);
+                                setTimeout(() => {
+                                    document.getElementById('orderPopupWrapper')?.classList.add('shown');
+                                }, 10);
+                            }} />
+                        </div>
                         <p className="errorText">
                             {removeOrderError}
                         </p>

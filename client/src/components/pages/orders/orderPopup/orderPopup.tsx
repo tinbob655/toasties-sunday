@@ -13,6 +13,8 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
     const [toggleMainCourse, setToggleMainCourse] = useState<boolean>(false);
     const [toggleDrink, setToggleDrink]= useState<boolean>(false);
     const [toggleDesert, setToggleDesert] = useState<boolean>(false);
+    const [additionalToasties, setAdditionalToasties] = useState<number[]>([]);
+    const [additionalDeserts, setAdditionalDeserts] = useState<number[]>([]);
 
     const errorRef = useRef<HTMLParagraphElement>(null);
 
@@ -61,7 +63,31 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                         <React.Fragment>
 
                             {/*the user wants a main*/}
-                            <OrderCheckboxes options={menuData.mainCourse.extras} />
+                            <OrderCheckboxes options={menuData.mainCourse.extras} suffix="_toasty_0" />
+                            {additionalToasties.map((_, arrIdx) => (
+                                <div key={`toasty_${arrIdx + 1}`} style={{position: 'relative', marginTop: '10px'}}>
+                                    <div className="dividerLine"></div>
+                                    <button type="button" aria-label="Remove toasty" style={{position: 'absolute', top: 0, right: 0, border: 'none', background: 'none', fontSize: '1.5em', cursor: 'pointer'}} onClick={() => {
+                                        setAdditionalToasties(additionalToasties.filter((_, i) => i !== arrIdx));
+                                    }}>
+                                        <h3>
+                                            X
+                                        </h3>
+                                    </button>
+                                    <p style={{marginLeft: '10px'}}>
+                                        Toasty #{arrIdx + 2} (£{Number(menuData.mainCourse.base.baseCost).toFixed(2)})
+                                    </p>
+                                    <OrderCheckboxes options={menuData.mainCourse.extras} suffix={`_toasty_${arrIdx + 1}`} />
+                                </div>
+                            ))}
+                            {/*add another toasty button*/}
+                            <button type="button" onClick={() => {
+                                setAdditionalToasties([...additionalToasties, additionalToasties.length + 1]);
+                            }}>
+                                <h3>
+                                    Add another toasty here!
+                                </h3>
+                            </button>
                         </React.Fragment>
                     ) : <></>}
                 </React.Fragment>
@@ -83,7 +109,7 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                                 </td>
                                 <td style={{width: "80%"}}>
                                     <label htmlFor="toggleDrinks" className="nextToCheckbox">
-                                        I want drinks (if no you get water)
+                                        I want a drink (if no you get water)
                                     </label>
                                 </td>
                             </tr>
@@ -94,7 +120,7 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                         <React.Fragment>
 
                             {/*the user wants a drink*/}
-                            <OrderCheckboxes options={menuData.drinks.extras} />
+                            <OrderCheckboxes options={menuData.drinks.extras} suffix="_drink_0" />
                         </React.Fragment>
                     ) : <></>}
                 </React.Fragment>
@@ -126,8 +152,32 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                     {toggleDesert ? (
                         <React.Fragment>
 
-                            {/*the user wants a drink*/}
-                            <OrderCheckboxes options={menuData.desert.extras} />
+                            {/*the user wants a desert*/}
+                            <OrderCheckboxes options={menuData.desert.extras} suffix="_desert_0" />
+                            {additionalDeserts.map((_, arrIdx) => (
+                                <div key={`desert_${arrIdx + 1}`} style={{position: 'relative', marginTop: '10px'}}>
+                                    <div className="dividerLine"></div>
+                                    <button type="button" aria-label="Remove waffle" style={{position: 'absolute', top: 0, right: 0, border: 'none', background: 'none', fontSize: '1.5em', cursor: 'pointer'}} onClick={() => {
+                                        setAdditionalDeserts(additionalDeserts.filter((_, i) => i !== arrIdx));
+                                    }}>
+                                        <h3>
+                                            X
+                                        </h3>
+                                    </button>
+                                    <p style={{marginLeft: '10px'}}>
+                                        Waffle #{arrIdx + 2} (£{Number(menuData.desert.base.baseCost).toFixed(2)})
+                                    </p>
+                                    <OrderCheckboxes options={menuData.desert.extras} suffix={`_desert_${arrIdx + 1}`} />
+                                </div>
+                            ))}
+                            {/*add another desert button*/}
+                            <button type="button" onClick={() => {
+                                setAdditionalDeserts([...additionalDeserts, additionalDeserts.length + 1]);
+                            }}>
+                                <h3>
+                                    Add another waffle here!
+                                </h3>
+                            </button>
                         </React.Fragment>
                     ) : <></>}
                 </React.Fragment>

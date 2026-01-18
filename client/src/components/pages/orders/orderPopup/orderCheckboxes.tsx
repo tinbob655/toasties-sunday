@@ -6,23 +6,26 @@ interface params {
         name: string,
         cost: number,
     }[],
+    suffix?: string,
 };
 
-export default function OrderCheckboxes({options}:params):React.ReactElement {
+export default function OrderCheckboxes({options, suffix = ''}:params):React.ReactElement {
 
     function getOptionsHTML():React.ReactElement[] {
         let tempOptionsHTML:React.ReactElement[] = [];
-        options.forEach((option) => {
+        options.forEach((option, idx) => {
+            const inputName = option.name + suffix;
+            const inputId = option.name + suffix;
             tempOptionsHTML.push(
-                <React.Fragment>
+                <React.Fragment key={inputId}>
                     <table style={{width: '50%', marginLeft: '50px'}}>
                         <thead>
                             <tr>
                                 <td>
-                                    <input type="checkbox" name={option.name} id={option.name} />
+                                    <input type="checkbox" name={inputName} id={inputId} />
                                 </td>
                                 <td style={{width: '80%'}}>
-                                    <label htmlFor={option.name}>
+                                    <label htmlFor={inputId}>
                                         {option.name} for £{Number(option.cost).toFixed(2)}
                                     </label>
                                 </td>

@@ -107,4 +107,40 @@ router.delete('/deleteOrder/:username', async (req, res) => {
   }
 });
 
+
+//edit an order based on username
+router.put('/editOrder/:username', async (req, res) => {
+  try {
+
+    //make sure we have a username
+    const username = req.params.username;
+    if (!username) {
+      return res.status(400).json({error: "Did not receive a username"});
+    };
+  
+    //make sure we got given a new cost
+    const newCost = req.body.cost;
+    if (!newCost) {
+      return res.status(400).json({error: "Did not receive a cost"});
+    }
+    else if (newCost <= 0 || newCost > 100) {
+      return res.status(400).json({error: `Invalid cost: ${newCost}`});
+    };
+  
+    //get the old order
+    const oldOrder = await Purchase.findByPk(username);
+    if (!oldOrder) {
+      return res.status(400).json({error: `Could not find an order associated with username: ${username}`});
+    };
+  
+    //edit the order
+    oldOrder.cost = newCost;
+    await oldOrder.save();
+    return res.status(200).json(oldOrder);
+  }
+  catch (err) {
+    return res.status(500).json({error: err.message});
+  };
+});
+
 module.exports = router;
