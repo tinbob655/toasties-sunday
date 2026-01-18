@@ -53,7 +53,7 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: 
                 setErrorMessage(error.message || 'Payment failed.');
             } else if (paymentIntent && paymentIntent.status === 'succeeded') {
                 event.complete('success');
-                closeFunc();
+                window.location.href = '/paymentCompleted';
             } else if (paymentIntent && paymentIntent.status === 'requires_action') {
                 // Handle 3D Secure or other actions
                 const { error: actionError } = await stripe.confirmCardPayment(clientSecret);
@@ -62,7 +62,7 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: 
                     setErrorMessage(actionError.message || 'Payment requires additional action.');
                 } else {
                     event.complete('success');
-                    closeFunc();
+                    window.location.href = '/paymentCompleted';
                 }
             } else {
                 event.complete('fail');

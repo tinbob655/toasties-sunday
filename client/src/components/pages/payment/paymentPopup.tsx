@@ -37,7 +37,7 @@ export default function PaymentPopup({cost, username, closeFunc}:params):React.R
       <h2>
         Get your food, {username}!
       </h2>
-      <div className="dividerLine"></div>
+      <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
       <Elements stripe={stripePromise} options={{clientSecret}}>
         <PaymentRequestButton cost={cost} clientSecret={clientSecret} closeFunc={closeFunc} />
