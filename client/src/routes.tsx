@@ -8,6 +8,7 @@ import Account from './components/pages/account/account';
 import Menu from './components/pages/menu/menu';
 import Orders from './components/pages/orders/orders';
 import Admin from './components/pages/admin/admin';
+import PaymentCompleted from './components/pages/paymentCompleted/paymentCompleted';
 
 export default function AllRoutes():React.ReactElement {
 
@@ -27,6 +28,7 @@ function getRoutes():React.ReactElement[] {
         ['menu', <Menu/>],
         ['orders', <Orders/>],
         ['admin', <Admin/>],
+        ['paymentCompleted', <PaymentCompleted/>],
     ];
 
     //generate routes
