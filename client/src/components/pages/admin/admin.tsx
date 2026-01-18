@@ -90,7 +90,7 @@ export default function Admin():React.ReactElement {
             orders.forEach((order) => {
 
                 //only show paid-for orders
-                if (true) {
+                if (order.paid) {
                     tempOrdersHTML.push(
                         <React.Fragment key={order.username}>
                             <li style={{marginBottom: '15px', listStyle: 'none'}}>
