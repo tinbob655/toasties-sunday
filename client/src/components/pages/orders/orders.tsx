@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
 import type { orderObj } from './orderObj';
+import PaymentPopup from '../payment/paymentPopup';
 
 
 export default function Orders():React.ReactElement {
@@ -14,6 +15,7 @@ export default function Orders():React.ReactElement {
     const [orderPopup, setOrderPopup] = useState<React.ReactElement>(<></>);
     const [userOrder, setUserOrder] = useState<orderObj|null>(null);
     const [removeOrderError, setRemoveOrderError] = useState<string>('');
+    const [paymentPopup, setPaymentPopup] = useState<React.ReactElement>(<></>);
 
 
     //see if the user has already placed an order this week
@@ -111,6 +113,11 @@ export default function Orders():React.ReactElement {
         };
     };
 
+
+    //will fire when the user is done paying
+    function paymentDone() {
+    };
+
     return (
         <React.Fragment>
             <PageHeader title="Orders" subtitle="Get it while its going" />
@@ -120,15 +127,30 @@ export default function Orders():React.ReactElement {
                 {alreadyOrdered ? (
                     <React.Fragment>
 
-                        {/*the user has already ordered, allow them to change their order*/}
+                        {/*the user has already ordered*/}
                         <h2 className="alignRight">
                             You have already ordered, {userOrder?.username}!
                         </h2>
                         <p className="alignRight">
                             The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
                         </p>
+
+                        {/*pay now button*/}
+                        <div style={{float: 'right', marginTop: '15px'}}>
+                            <FancyButton text="Pay now!" transformOrigin="right" action={() => {
+                                setPaymentPopup(
+                                    <PaymentPopup username={username} cost={userOrder?.cost || -1} closeFunc={paymentDone} />
+                                );
+                                setTimeout(() => {
+                                    document.getElementById('paymentPopupWrapper')?.classList.add('shown');
+                                }, 10);
+                            }} />
+                        </div>
+
+                        {/*remove order button*/}
                         <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
 
+                        {/*edit order button*/}
                         <div style={{marginTop: '20px'}}>
                             <FancyButton text="Change your order" transformOrigin="left" action={() => {
                                 setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMessage: Function) => {changeOrder(event, setErrorMessage)}} />);
@@ -137,6 +159,9 @@ export default function Orders():React.ReactElement {
                                 }, 10);
                             }} />
                         </div>
+
+
+
                         <p className="errorText">
                             {removeOrderError}
                         </p>
@@ -160,6 +185,7 @@ export default function Orders():React.ReactElement {
             </div>
 
             {orderPopup}
+            {paymentPopup}
         </React.Fragment>
     );
 };

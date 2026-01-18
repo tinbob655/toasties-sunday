@@ -51,6 +51,7 @@ app.use(session({
 //serve the frontend
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
+
 // routes
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from backend!' });
@@ -61,6 +62,11 @@ app.use('/api/db/account', accountRouter);
 
 const purchaseRouter = require('./routes/purchase');
 app.use('/api/db/order', purchaseRouter);
+
+const paymentRouter = require('./routes/payment');
+app.use('/api/payment', paymentRouter);
+
+
 
 //fallback will give a page
 app.use((req, res) => {

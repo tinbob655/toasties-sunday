@@ -13,7 +13,7 @@ export default function OrderCheckboxes({options, suffix = ''}:params):React.Rea
 
     function getOptionsHTML():React.ReactElement[] {
         let tempOptionsHTML:React.ReactElement[] = [];
-        options.forEach((option, idx) => {
+        options.forEach((option) => {
             const inputName = option.name + suffix;
             const inputId = option.name + suffix;
             tempOptionsHTML.push(
