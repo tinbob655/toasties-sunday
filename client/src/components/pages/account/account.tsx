@@ -30,7 +30,7 @@ export default function Account():React.ReactElement {
                     return;
                 };
 
-                //sign up with profile picture
+                //sign up
                 await handleSignUp(target.username.value, target.password.value);
                 await refreshAuth();
             } 

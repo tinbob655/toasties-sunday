@@ -17,7 +17,7 @@ async function logIn(username:string, password:string):Promise<accountObj> {
     return res;
 };
 
-//create a new account with profile picture
+//create a new account
 async function createAccount(username:string, password:string):Promise<accountObj> {
     const formData = new FormData();
     formData.append('username', username);

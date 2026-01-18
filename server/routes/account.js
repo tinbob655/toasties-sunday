@@ -12,7 +12,6 @@ class Account extends Model {};
 Account.init({
     username: DataTypes.STRING,
     passwordHash: DataTypes.STRING,
-    profilePicture: DataTypes.BLOB,
 }, {sequelize, modelName: 'account'});
 
 
@@ -31,7 +30,7 @@ router.get('/queryLoggedIn', (req, res) => {
 router.post('/createAccount', upload.none(), async (req, res) => {
     const {username, password} = req.body;
 
-    //make sure we have a username, password, and profile picture
+    //make sure we have a username, password
     if (!username || !password) {
          return res.status(400).json({message: "Did not receive either a username or password"});
     };

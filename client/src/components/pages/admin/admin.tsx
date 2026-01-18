@@ -46,7 +46,7 @@ export default function Admin():React.ReactElement {
             //generate markup
             orders.forEach((order) => {
 
-                //only show paid for orders
+                //only show paid-for orders
                 if (order.paid) {
                     tempOrdersHTML.push(
                         <React.Fragment>
