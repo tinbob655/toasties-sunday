@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
 import { getOrder, placeOrder, deleteOrder, editOrder, extractCost } from './ordersAPI';
+import { extractOrderItems } from './ordersAPI';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
@@ -26,11 +27,7 @@ export default function Orders():React.ReactElement {
 
                     //the user has already made an order
                     setAlreadyOrdered(true);
-                    setUserOrder({
-                        username: res.username,
-                        cost: res.cost,
-                        paid: res.paid,
-                    });
+                    setUserOrder(res);
                 }
                 else {
                     setAlreadyOrdered(false);
@@ -45,11 +42,18 @@ export default function Orders():React.ReactElement {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
         const cost = extractCost(form, setErrorMsg);
+        const { toasties, drinks, deserts } = extractOrderItems(form);
 
-        
         //place the order
         try {
-            const res = await placeOrder(cost, username);
+            const res = await placeOrder({
+                cost: cost,
+                username: username,
+                toasties,
+                drinks,
+                deserts,
+                paid: false,
+            });
             setAlreadyOrdered(true);
             setUserOrder(res);
 
@@ -96,11 +100,17 @@ export default function Orders():React.ReactElement {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
         const cost = extractCost(form, setErrorMsg);
+        const {toasties, drinks, deserts} = extractOrderItems(form);
 
         //edit the order
         try {
-            const res = await editOrder(username, cost);
-            console.log(res);
+            const res = await editOrder({
+                cost: cost,
+                username: username,
+                toasties,
+                drinks,
+                deserts,
+            });
             setUserOrder(res);
 
             //close the popup

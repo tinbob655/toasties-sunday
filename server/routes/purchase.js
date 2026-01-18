@@ -6,9 +6,49 @@ const router = express.Router();
 class Purchase extends Model {}
 Purchase.init(
   {
-    username: { type: DataTypes.STRING, primaryKey: true },
+    username: {
+      type: DataTypes.STRING, primaryKey: true
+    },
+
     cost: DataTypes.DECIMAL(10,2),
-    paid: DataTypes.BOOLEAN,
+
+    paid: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+
+    toasties: {
+      type: DataTypes.TEXT,
+      get() {
+        const val = this.getDataValue('toasties');
+        return val ? JSON.parse(val) : [];
+      },
+      set(val) {
+        this.setDataValue('toasties', JSON.stringify(val));
+      }
+    },
+
+    drinks: {
+      type: DataTypes.TEXT,
+      get() {
+        const val = this.getDataValue('drinks');
+        return val ? JSON.parse(val) : [];
+      },
+      set(val) {
+        this.setDataValue('drinks', JSON.stringify(val));
+      }
+    },
+
+    deserts: {
+      type: DataTypes.TEXT,
+      get() {
+        const val = this.getDataValue('deserts');
+        return val ? JSON.parse(val): [];
+      },
+      set(val) {
+        this.setDataValue('deserts', JSON.stringify(val));
+      }
+    }
   },
   {
     sequelize,
@@ -21,15 +61,7 @@ Purchase.init(
 router.get('/getOrders', async (req, res) => {
   try {
     const orders = await Purchase.findAll();
-
-    //return only username and parsed items
-    const formatted = orders.map(order => ({
-      username: order.username,
-      cost: order.cost,
-      paid: order.paid,
-    }));
-
-    res.json(formatted);
+    return res.status(200).json(orders);
   }
   catch (err) {
     res.status(500).json({ error: err.message });
@@ -47,12 +79,7 @@ router.get('/getOrder/:username', async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     };
 
-    //return only username and parsed items
-    res.json({
-      username: order.username,
-      cost: order.cost,
-      paid: order.paid,
-    });
+    return res.status(200).json(order);
   }
   catch(err) {
     res.status(500).json({error: err.message});
@@ -63,20 +90,28 @@ router.get('/getOrder/:username', async (req, res) => {
 //create a new order
 router.post('/createNewOrder/:username', async (req, res) => {
   try {
-    const username = req.params.username;
-    const cost = req.body.cost;
 
-    //if the cost is 0, terminate
-    if (cost <= 0) {
+    //make sure we have a username
+    const username = req.params.username;
+    if (!username) {
+      return res.status(400).json({error: "Did not receive a username to place the order with"});
+    };
+
+    //if the cost is 0 or too large, terminate
+    const cost = req.body.cost;
+    if (cost <= 0 || cost > 100) {
       return res.status(400).json({error: "A cost cannot be 0 or less"});
     };
 
+    //create the order
+    const { toasties, drinks, deserts } = req.body;
     const newOrder = await Purchase.create({
-      username: username,
-      cost: cost,
-      paid: false,
+      username,
+      cost,
+      toasties,
+      drinks,
+      deserts
     });
-
     return res.status(201).json(newOrder);
   }
   catch (err) {
@@ -137,8 +172,14 @@ router.put('/editOrder/:username', async (req, res) => {
       return res.status(400).json({error: `Could not find an order associated with username: ${username}`});
     };
   
-    //edit the order
+    //update the values
+    ['toasties', 'drinks', 'deserts'].forEach(key => {
+      if (oldOrder[key] != req.body[key]) {
+        oldOrder[key] = req.body[key];
+      };
+    });
     oldOrder.cost = newCost;
+
     await oldOrder.save();
     return res.status(200).json(oldOrder);
   }

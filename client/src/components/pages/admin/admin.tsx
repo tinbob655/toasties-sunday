@@ -6,6 +6,50 @@ import { getOrders } from '../orders/ordersAPI';
 import type { orderObj } from '../orders/orderObj';
 
 
+// Helper to format order items nicely
+function formatOrderItems(items: string[], marker: string, label: string): React.ReactElement[] {
+    const result: React.ReactElement[] = [];
+    let currentGroup: string[] = [];
+    let groupIndex = 0;
+
+    items.forEach((item, i) => {
+        if (item === marker) {
+            if (i > 0 || currentGroup.length > 0) {
+                // Push previous group as a bullet point
+                result.push(
+                    <li key={`${label}-${groupIndex}`} style={{marginLeft: '10px'}}>
+                        <strong>{label} #{groupIndex + 1}:</strong> {currentGroup.length > 0 ? currentGroup.join(', ') : 'Plain'}
+                    </li>
+                );
+                groupIndex++;
+                currentGroup = [];
+            }
+        } else {
+            currentGroup.push(item);
+        }
+    });
+    // Push last group
+    if (items.length > 0) {
+        result.push(
+            <li key={`${label}-${groupIndex}`} style={{marginLeft: '10px'}}>
+                <strong>{label} #{groupIndex + 1}:</strong> {currentGroup.length > 0 ? currentGroup.join(', ') : 'Plain'}
+            </li>
+        );
+    }
+    return result;
+}
+
+function formatDrinks(drinks: string[]): React.ReactElement[] {
+    if (!drinks || drinks.length === 0) return [];
+    return drinks.map((drink, i) => (
+        <li key={`Drink-${i}`} style={{marginLeft: '10px'}}>
+            <strong>Drink:</strong> {drink}
+        </li>
+    ));
+}
+
+
+
 export default function Admin():React.ReactElement {
 
     const {loggedIn, username} = useAuth();
@@ -29,7 +73,6 @@ export default function Admin():React.ReactElement {
     useEffect(() => {
         if (sudo) {
             getOrders().then((res) => {
-                console.log(res);
                 setOrders(res);
             });
         };
@@ -47,12 +90,15 @@ export default function Admin():React.ReactElement {
             orders.forEach((order) => {
 
                 //only show paid-for orders
-                if (order.paid) {
+                if (true) {
                     tempOrdersHTML.push(
-                        <React.Fragment>
-                            <li>
-                                {order.username} bought an order worth £{order.cost}
+                        <React.Fragment key={order.username}>
+                            <li style={{marginBottom: '15px', listStyle: 'none'}}>
+                                <strong>{order.username}</strong>
                             </li>
+                            {formatOrderItems(order.toasties || [], 'NEW TOASTY', 'Toasty')}
+                            {formatDrinks(order.drinks || [])}
+                            {formatOrderItems(order.deserts || [], 'NEW DESERT', 'Waffle')}
                         </React.Fragment>
                     );
                 };
