@@ -29,6 +29,7 @@ export default function Admin():React.ReactElement {
     useEffect(() => {
         if (sudo) {
             getOrders().then((res) => {
+                console.log(res);
                 setOrders(res);
             });
         };
@@ -37,17 +38,18 @@ export default function Admin():React.ReactElement {
     
     //when we get orders, update the frontend
     useEffect(() => {
-        if (orders && orders.length > 0) {
+
+        //only fire if we have at least one order
+        if (orders && orders.length >= 1) {
             let tempOrdersHTML:React.ReactElement[] = [];
+
+            //generate markup
             orders.forEach((order) => {
                 tempOrdersHTML.push(
                     <React.Fragment>
-                        <p>
-                            <b>
-                                {order.username}:
-                            </b>
-                            {JSON.stringify(order)}
-                        </p>
+                        <li>
+                            {order.username} bought an order worth £{order.cost?.toFixed(2)}
+                        </li>
                     </React.Fragment>
                 );
             });
@@ -71,7 +73,9 @@ export default function Admin():React.ReactElement {
                         <p className="alignRight">
                             This weeks orders are:
                         </p>
-                        {ordersHTML}
+                        <ul className="alignLeft">
+                            {ordersHTML}
+                        </ul>
                     </div>
                 </React.Fragment>
             ) : (

@@ -24,7 +24,7 @@ router.get('/getOrders', async (req, res) => {
     //return only username and parsed items
     const formatted = orders.map(order => ({
       username: order.username,
-      items: order.items
+      cost: order.cost,
     }));
 
     res.json(formatted);
