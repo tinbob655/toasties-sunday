@@ -29,6 +29,7 @@ export default function Orders():React.ReactElement {
                     setUserOrder({
                         username: res.username,
                         cost: res.cost,
+                        paid: res.paid,
                     });
                 }
                 else {

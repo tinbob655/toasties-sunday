@@ -132,3 +132,9 @@ export function extractCost(form: HTMLFormElement, setErrorMsg: Function):number
 
     return cost;
 };
+
+//mark an order as paid
+export async function payOrder(username: string):Promise<orderObj> {
+    const res = (await axios.put(`/api/db/order/payOrder/${encodeURIComponent(username)}`)).data;
+    return res;
+}

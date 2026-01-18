@@ -8,6 +8,7 @@ Purchase.init(
   {
     username: { type: DataTypes.STRING, primaryKey: true },
     cost: DataTypes.DECIMAL(10,2),
+    paid: DataTypes.BOOLEAN,
   },
   {
     sequelize,
@@ -25,6 +26,7 @@ router.get('/getOrders', async (req, res) => {
     const formatted = orders.map(order => ({
       username: order.username,
       cost: order.cost,
+      paid: order.paid,
     }));
 
     res.json(formatted);
@@ -49,6 +51,7 @@ router.get('/getOrder/:username', async (req, res) => {
     res.json({
       username: order.username,
       cost: order.cost,
+      paid: order.paid,
     });
   }
   catch(err) {
@@ -71,6 +74,7 @@ router.post('/createNewOrder/:username', async (req, res) => {
     const newOrder = await Purchase.create({
       username: username,
       cost: cost,
+      paid: false,
     });
 
     return res.status(201).json(newOrder);
@@ -135,6 +139,35 @@ router.put('/editOrder/:username', async (req, res) => {
   
     //edit the order
     oldOrder.cost = newCost;
+    await oldOrder.save();
+    return res.status(200).json(oldOrder);
+  }
+  catch (err) {
+    return res.status(500).json({error: err.message});
+  };
+});
+
+
+//mark an order as paid
+router.put('/payOrder/:username', async (req, res) => {
+
+  try {
+
+    //make sure we have a username
+    const username = req.params.username;
+    if (!username) {
+      return res.status(400).json({error: "Did not receive a username"});
+    };
+  
+    //we have a username, mark the order as paid
+    //get the old order
+    const oldOrder = await Purchase.findByPk(username);
+    if (!oldOrder) {
+      return res.status(400).json({error: `Could not find an order associated with username: ${username}`});
+    };
+  
+    //edit the order
+    oldOrder.paid = true;
     await oldOrder.save();
     return res.status(200).json(oldOrder);
   }

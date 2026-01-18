@@ -46,13 +46,16 @@ export default function Admin():React.ReactElement {
             //generate markup
             orders.forEach((order) => {
 
-                tempOrdersHTML.push(
-                    <React.Fragment>
-                        <li>
-                            {order.username} bought an order worth £{order.cost}
-                        </li>
-                    </React.Fragment>
-                );
+                //only show paid for orders
+                if (order.paid) {
+                    tempOrdersHTML.push(
+                        <React.Fragment>
+                            <li>
+                                {order.username} bought an order worth £{order.cost}
+                            </li>
+                        </React.Fragment>
+                    );
+                };
             });
             setOrdersHTML(tempOrdersHTML);
         };
