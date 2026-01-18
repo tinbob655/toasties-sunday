@@ -109,7 +109,7 @@ export default function OrderPopup({closeFunc}:params):React.ReactElement {
                                 </td>
                                 <td style={{width: "80%"}}>
                                     <label htmlFor="toggleDrinks" className="nextToCheckbox">
-                                        I want a drink (if no you get water)
+                                        I want a drink (e.g: coke, coffee, baileys)
                                     </label>
                                 </td>
                             </tr>

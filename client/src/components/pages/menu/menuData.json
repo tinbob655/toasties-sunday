@@ -35,8 +35,12 @@
                 "cost": 0.98
             },
             {
-                "name": "Coffee (americo)",
+                "name": "Coffee (americano)",
                 "cost": 1.03
+            },
+            {
+                "name": "Bailey's coffee",
+                "cost": 2.64
             }
         ]
     },
