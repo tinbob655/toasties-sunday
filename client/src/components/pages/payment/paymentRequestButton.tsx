@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStripe, PaymentRequestButtonElement } from '@stripe/react-stripe-js';
+import { payOrder } from '../orders/ordersAPI';
+import { useAuth } from '../../../context/authContext';
 
 
 interface params {
@@ -11,6 +13,8 @@ interface params {
 export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: params): React.ReactElement {
 
     const stripe = useStripe();
+    const auth = useAuth();
+
     const [paymentRequest, setPaymentRequest] = useState<any>(null);
     const [canMakePayment, setCanMakePayment] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -51,23 +55,31 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: 
             if (error) {
                 event.complete('fail');
                 setErrorMessage(error.message || 'Payment failed.');
-            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+            }
+            else if (paymentIntent && paymentIntent.status === 'succeeded') {
                 event.complete('success');
-                window.location.href = '/paymentCompleted';
-            } else if (paymentIntent && paymentIntent.status === 'requires_action') {
+                payOrder(auth.username).then(() => {
+                    window.location.href = '/paymentCompleted';
+                });
+            }
+            else if (paymentIntent && paymentIntent.status === 'requires_action') {
                 // Handle 3D Secure or other actions
                 const { error: actionError } = await stripe.confirmCardPayment(clientSecret);
                 if (actionError) {
                     event.complete('fail');
                     setErrorMessage(actionError.message || 'Payment requires additional action.');
-                } else {
-                    event.complete('success');
-                    window.location.href = '/paymentCompleted';
                 }
-            } else {
+                else {
+                    event.complete('success');
+                    payOrder(auth.username).then(() => {
+                        window.location.href = '/paymentCompleted';
+                    });
+                };
+            }
+            else {
                 event.complete('fail');
                 setErrorMessage('Payment failed.');
-            }
+            };
         });
 
     }, [stripe, clientSecret, cost, closeFunc]);

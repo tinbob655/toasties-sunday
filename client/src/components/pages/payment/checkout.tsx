@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCheckout, ExpressCheckoutElement } from '@stripe/react-stripe-js/checkout';
-import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
 
 
@@ -10,7 +9,7 @@ interface params {
 
 export default function Checkout({closeFunc}:params):React.ReactElement {
 
-    const {loggedIn, username} = useAuth();
+    const {loggedIn} = useAuth();
 
     async function afterPaid():Promise<void> {
 
@@ -18,7 +17,6 @@ export default function Checkout({closeFunc}:params):React.ReactElement {
         if (loggedIn) {
 
             //mark the user's order as paid
-            await payOrder(username);
             closeFunc();
         }
         else {
