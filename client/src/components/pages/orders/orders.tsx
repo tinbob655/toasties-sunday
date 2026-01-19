@@ -52,7 +52,6 @@ export default function Orders():React.ReactElement {
                 toasties,
                 drinks,
                 deserts,
-                paid: false,
             });
             setAlreadyOrdered(true);
             setUserOrder(res);
