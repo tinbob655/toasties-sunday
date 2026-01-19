@@ -29,7 +29,7 @@ export async function getOrder(username: string): Promise<orderObj | null> {
 };
 
 //place a new order
-export async function placeOrder(data: orderObj):Promise<orderObj> {
+export async function placeOrder(data: { username: string; cost: number; toasties: string[]; drinks: string[]; deserts: string[] }):Promise<orderObj> {
 
     //the user cannot make orders between 13:00 and 21:59 on a Sunday.
     const DISABLE_TIMECHECK = import.meta.env.VITE_DISABLE_ORDERS_TIMECHECK;
