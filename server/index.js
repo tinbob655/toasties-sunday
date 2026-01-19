@@ -4,7 +4,11 @@ require('dotenv').config();
 // Ensure database tables are created
 const sequelize = require('./sequelize');
 const SequelizeStore = require('connect-session-sequelize')(require('express-session').Store);
-sequelize.sync();
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synced successfully');
+}).catch(err => {
+  console.error('Database sync error:', err);
+});
 
 const express = require('express');
 const path = require('path');

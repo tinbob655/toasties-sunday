@@ -10,7 +10,10 @@ Purchase.init(
       type: DataTypes.STRING, primaryKey: true
     },
 
-    cost: DataTypes.DECIMAL(10,2),
+    cost: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: false,
+    },
 
     paid: {
       type: DataTypes.BOOLEAN,
@@ -19,6 +22,8 @@ Purchase.init(
 
     toasties: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '[]',
       get() {
         const val = this.getDataValue('toasties');
         return val ? JSON.parse(val) : [];
@@ -30,6 +35,8 @@ Purchase.init(
 
     drinks: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '[]',
       get() {
         const val = this.getDataValue('drinks');
         return val ? JSON.parse(val) : [];
@@ -41,6 +48,8 @@ Purchase.init(
 
     deserts: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '[]',
       get() {
         const val = this.getDataValue('deserts');
         return val ? JSON.parse(val): [];
@@ -116,6 +125,7 @@ router.post('/createNewOrder/:username', async (req, res) => {
     return res.status(201).json(newOrder);
   }
   catch (err) {
+    console.error('Error creating order:', err);
     return res.status(500).json({error: err.message});
   };
 })
