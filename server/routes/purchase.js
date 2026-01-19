@@ -24,7 +24,7 @@ Purchase.init(
         return val ? JSON.parse(val) : [];
       },
       set(val) {
-        this.setDataValue('toasties', JSON.stringify(val));
+        this.setDataValue('toasties', JSON.stringify(val ?? []));
       }
     },
 
@@ -35,7 +35,7 @@ Purchase.init(
         return val ? JSON.parse(val) : [];
       },
       set(val) {
-        this.setDataValue('drinks', JSON.stringify(val));
+        this.setDataValue('drinks', JSON.stringify(val ?? []));
       }
     },
 
@@ -46,7 +46,7 @@ Purchase.init(
         return val ? JSON.parse(val): [];
       },
       set(val) {
-        this.setDataValue('deserts', JSON.stringify(val));
+        this.setDataValue('deserts', JSON.stringify(val ?? []));
       }
     }
   },
@@ -105,6 +105,7 @@ router.post('/createNewOrder/:username', async (req, res) => {
 
     //create the order
     const { toasties, drinks, deserts } = req.body;
+    console.log(toasties, drinks, deserts);
     const newOrder = await Purchase.create({
       username,
       cost,
