@@ -7,11 +7,14 @@ import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
 import type { orderObj } from './orderObj';
 import PaymentPopup from '../payment/paymentPopup';
+import { useNavigate } from 'react-router';
 
 
 export default function Orders():React.ReactElement {
 
     const {loggedIn, username} = useAuth();
+    const navigate = useNavigate();
+
     const [alreadyOrdered, setAlreadyOrdered] = useState<boolean>(false);
     const [orderPopup, setOrderPopup] = useState<React.ReactElement>(<></>);
     const [userOrder, setUserOrder] = useState<orderObj|null>(null);
@@ -139,7 +142,12 @@ export default function Orders():React.ReactElement {
 
                         {/*the user has already ordered*/}
                         <h2 className="alignRight">
-                            You have already ordered, {userOrder?.username}!
+
+                            {/*secret tamerlan button*/}
+                            <span onDoubleClick={() => {navigate('/tamerlan')}} style={{color:  '#94bb92'}} >
+                                Y
+                            </span>
+                            ou have already ordered, {userOrder?.username}!
                         </h2>
                         <p className="alignRight">
                             The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
