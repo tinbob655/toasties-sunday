@@ -149,21 +149,31 @@ export default function Orders():React.ReactElement {
                             </span>
                             ou have already ordered, {userOrder?.username}!
                         </h2>
-                        <p className="alignRight">
-                            The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
-                        </p>
+                        {userOrder?.paid ? (
+                            <React.Fragment>
+                                <p>
+                                    You've paid for your order!
+                                </p>
+                            </React.Fragment>
+                        ) : (
+                            <React.Fragment>
+                                <p className="alignRight">
+                                    The cost of your order is currently: £{userOrder && userOrder.cost !== undefined ? Number(userOrder.cost).toFixed(2) : ''}
+                                </p>
 
-                        {/*pay now button*/}
-                        <div style={{float: 'right', marginTop: '15px'}}>
-                            <FancyButton text="Pay now!" transformOrigin="right" action={() => {
-                                setPaymentPopup(
-                                    <PaymentPopup username={username} cost={userOrder?.cost || -1} closeFunc={paymentDone} />
-                                );
-                                setTimeout(() => {
-                                    document.getElementById('paymentPopupWrapper')?.classList.add('shown');
-                                }, 10);
-                            }} />
-                        </div>
+                                {/*pay now button*/}
+                                <div style={{float: 'right', marginTop: '15px'}}>
+                                    <FancyButton text="Pay now!" transformOrigin="right" action={() => {
+                                        setPaymentPopup(
+                                            <PaymentPopup username={username} cost={userOrder?.cost || -1} closeFunc={paymentDone} />
+                                        );
+                                        setTimeout(() => {
+                                            document.getElementById('paymentPopupWrapper')?.classList.add('shown');
+                                        }, 10);
+                                    }} />
+                                </div>
+                            </React.Fragment>
+                        )}
 
                         {/*remove order button*/}
                         <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
