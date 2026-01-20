@@ -151,7 +151,7 @@ export default function Orders():React.ReactElement {
                         </h2>
                         {userOrder?.paid ? (
                             <React.Fragment>
-                                <p>
+                                <p className="alignRight">
                                     You've paid for your order!
                                 </p>
                             </React.Fragment>
