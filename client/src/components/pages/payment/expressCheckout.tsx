@@ -51,8 +51,8 @@ export default function ExpressCheckout({ clientSecret, username }: params): Rea
                         googlePay: 'always',
                         applePay: 'always',
                         link: 'auto',
-                        amazonPay: 'auto',
-                        klarna: 'auto',
+                        amazonPay: 'never',
+                        klarna: 'never',
                         paypal: 'auto',
                     },
                 }}
