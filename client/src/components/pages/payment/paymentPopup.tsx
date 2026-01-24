@@ -35,12 +35,12 @@ export default function PaymentPopup({cost, username, closeFunc}:params):React.R
   return (
     <div className="popupWrapper" id="paymentPopupWrapper">
       <h2>
-        Get your food, {username}!
+        {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
       </h2>
       <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
       <Elements stripe={stripePromise} options={{clientSecret}}>
-        <PaymentRequestButton cost={cost} clientSecret={clientSecret} closeFunc={closeFunc} />
+        <PaymentRequestButton cost={cost} clientSecret={clientSecret} closeFunc={closeFunc} username={username} />
       </Elements>
     </div>
   );

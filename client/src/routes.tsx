@@ -10,6 +10,7 @@ import Orders from './components/pages/orders/orders';
 import Admin from './components/pages/admin/admin';
 import PaymentCompleted from './components/pages/payment/paymentCompleted';
 import Tamerlan from './components/pages/tamerlan/tamerlan';
+import Support from './components/pages/support/support';
 
 export default function AllRoutes():React.ReactElement {
 
@@ -31,6 +32,7 @@ function getRoutes():React.ReactElement[] {
         ['admin', <Admin/>],
         ['paymentCompleted', <PaymentCompleted/>],
         ['tamerlan', <Tamerlan/>],
+        ['support', <Support/>],
     ];
 
     //generate routes

@@ -8,9 +8,10 @@ interface params {
     cost: number,
     clientSecret: string,
     closeFunc: Function,
+    username: string,
 };
 
-export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: params): React.ReactElement {
+export default function PaymentRequestButton({ cost, clientSecret, closeFunc, username }: params): React.ReactElement {
 
     const stripe = useStripe();
     const auth = useAuth();
@@ -58,9 +59,14 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: 
             }
             else if (paymentIntent && paymentIntent.status === 'succeeded') {
                 event.complete('success');
-                payOrder(auth.username).then(() => {
+                // Skip database update for anonymous users
+                if (username === 'NO_NAME') {
                     window.location.href = '/paymentCompleted';
-                });
+                } else {
+                    payOrder(auth.username).then(() => {
+                        window.location.href = '/paymentCompleted';
+                    });
+                }
             }
             else if (paymentIntent && paymentIntent.status === 'requires_action') {
                 // Handle 3D Secure or other actions
@@ -71,9 +77,14 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc }: 
                 }
                 else {
                     event.complete('success');
-                    payOrder(auth.username).then(() => {
+                    // Skip database update for anonymous users
+                    if (username === 'NO_NAME') {
                         window.location.href = '/paymentCompleted';
-                    });
+                    } else {
+                        payOrder(auth.username).then(() => {
+                            window.location.href = '/paymentCompleted';
+                        });
+                    }
                 };
             }
             else {
