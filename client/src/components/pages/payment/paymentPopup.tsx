@@ -2,18 +2,17 @@ import React, {useEffect, useState} from 'react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { createPaymentIntent } from './paymentAPI';
-import PaymentRequestButton from './paymentRequestButton';
+import ExpressCheckout from './expressCheckout';
 import CardPaymentForm from './cardPaymentForm';
 
 
 interface params {
     cost: number,
     username: string,
-    closeFunc: Function,
 };
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
-export default function PaymentPopup({cost, username, closeFunc}:params):React.ReactElement {
+export default function PaymentPopup({cost, username}:params):React.ReactElement {
 
     const [clientSecret, setClientSecret] = useState<string>('');
 
@@ -41,7 +40,7 @@ export default function PaymentPopup({cost, username, closeFunc}:params):React.R
       <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
       <Elements stripe={stripePromise} options={{clientSecret}}>
-        <PaymentRequestButton cost={cost} clientSecret={clientSecret} closeFunc={closeFunc} username={username} />
+        <ExpressCheckout clientSecret={clientSecret} username={username} />
         <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
         <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
         <CardPaymentForm clientSecret={clientSecret} username={username} />

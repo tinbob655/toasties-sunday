@@ -27,7 +27,7 @@ export default function Support():React.ReactElement {
         setDonationPopup(<></>);
 
         //open the payment popup with the cost
-        setPaymentPopup(<PaymentPopup cost={cost} username="NO_NAME" closeFunc={() => {}} />);
+        setPaymentPopup(<PaymentPopup cost={cost} username="NO_NAME" />);
         await new Promise(r => setTimeout(r, 10));
         document.getElementById('paymentPopupWrapper')?.classList.add('shown');
     };

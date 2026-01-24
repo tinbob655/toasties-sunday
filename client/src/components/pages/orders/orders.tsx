@@ -126,11 +126,6 @@ export default function Orders():React.ReactElement {
         };
     };
 
-
-    //will fire when the user is done paying
-    function paymentDone() {
-    };
-
     return (
         <React.Fragment>
             <PageHeader title="Orders" subtitle="Get it while its going" />
@@ -165,7 +160,7 @@ export default function Orders():React.ReactElement {
                                 <div style={{float: 'right', marginTop: '15px'}}>
                                     <FancyButton text="Pay now!" transformOrigin="right" action={() => {
                                         setPaymentPopup(
-                                            <PaymentPopup username={username} cost={userOrder?.cost || -1} closeFunc={paymentDone} />
+                                            <PaymentPopup username={username} cost={userOrder?.cost || -1} />
                                         );
                                         setTimeout(() => {
                                             document.getElementById('paymentPopupWrapper')?.classList.add('shown');
