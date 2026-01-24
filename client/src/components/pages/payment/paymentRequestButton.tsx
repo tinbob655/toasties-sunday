@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useStripe, PaymentRequestButtonElement } from '@stripe/react-stripe-js';
+import { useStripe, PaymentRequestButtonElement, ExpressCheckoutElement } from '@stripe/react-stripe-js';
 import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
 
@@ -103,13 +103,52 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc, us
         );
     }
 
+    async function handleExpressCheckoutConfirm(): Promise<void> {
+        if (!stripe) return;
+
+        const { error } = await stripe.confirmPayment({
+            clientSecret,
+            confirmParams: {
+                return_url: window.location.origin + '/paymentCompleted',
+            },
+            redirect: 'if_required',
+        });
+
+        if (error) {
+            setErrorMessage(error.message || 'Payment failed.');
+        } else {
+            // Skip database update for anonymous users
+            if (username === 'NO_NAME') {
+                window.location.href = '/paymentCompleted';
+            } else {
+                payOrder(auth.username).then(() => {
+                    window.location.href = '/paymentCompleted';
+                });
+            }
+        }
+    }
+
     return (
         <div>
+            {/* Google Pay / Apple Pay button */}
             {paymentRequest && (
-                <PaymentRequestButtonElement
-                    options={{ paymentRequest }}
-                />
+                <div style={{ marginBottom: '12px' }}>
+                    <PaymentRequestButtonElement
+                        options={{ paymentRequest }}
+                    />
+                </div>
             )}
+            {/* Link button */}
+            <ExpressCheckoutElement
+                onConfirm={handleExpressCheckoutConfirm}
+                options={{
+                    paymentMethods: {
+                        applePay: 'never',
+                        googlePay: 'never',
+                        link: 'auto',
+                    },
+                }}
+            />
         </div>
     );
 };
