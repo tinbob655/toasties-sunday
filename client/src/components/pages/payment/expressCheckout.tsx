@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useStripe, ExpressCheckoutElement } from '@stripe/react-stripe-js';
+import type { StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js';
 import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
 
@@ -15,10 +16,11 @@ export default function ExpressCheckout({ clientSecret, username }: params): Rea
     const auth = useAuth();
     const [errorMessage, setErrorMessage] = useState<string>('');
 
-    async function handleConfirm(): Promise<void> {
+    const handleConfirm = useCallback(async (event: StripeExpressCheckoutElementConfirmEvent): Promise<void> => {
         if (!stripe) return;
 
         const { error } = await stripe.confirmPayment({
+            elements: event.expressPaymentType ? undefined : undefined,
             clientSecret,
             confirmParams: {
                 return_url: window.location.origin + '/paymentCompleted',
@@ -38,12 +40,22 @@ export default function ExpressCheckout({ clientSecret, username }: params): Rea
                 });
             }
         }
-    }
+    }, [stripe, clientSecret, username, auth.username]);
 
     return (
         <div>
-            <ExpressCheckoutElement
+            <ExpressCheckoutElement 
                 onConfirm={handleConfirm}
+                options={{
+                    paymentMethods: {
+                        googlePay: 'always',
+                        applePay: 'always',
+                        link: 'auto',
+                        amazonPay: 'auto',
+                        klarna: 'auto',
+                        paypal: 'auto',
+                    },
+                }}
             />
             {errorMessage && <p className="errorText">{errorMessage}</p>}
         </div>
