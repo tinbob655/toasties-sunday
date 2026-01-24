@@ -4,7 +4,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { createPaymentIntent } from './paymentAPI';
 import ExpressCheckout from './expressCheckout';
 import CardPaymentForm from './cardPaymentForm';
-import Popup from '../../multiPageComponents/popup';
 
 
 interface params {
@@ -34,7 +33,7 @@ export default function PaymentPopup({cost, username}:params):React.ReactElement
     }
 
   return (
-    <Popup wrapperId="paymentPopupWrapper">
+    <div className="popupWrapper" id="paymentPopupWrapper">
       <React.Fragment>
         <h2>
           {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
@@ -48,6 +47,6 @@ export default function PaymentPopup({cost, username}:params):React.ReactElement
           <CardPaymentForm clientSecret={clientSecret} username={username} />
         </Elements>
       </React.Fragment>
-    </Popup>
+    </div>
   );
 };
