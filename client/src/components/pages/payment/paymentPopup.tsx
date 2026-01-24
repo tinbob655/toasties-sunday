@@ -3,6 +3,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { createPaymentIntent } from './paymentAPI';
 import PaymentRequestButton from './paymentRequestButton';
+import CardPaymentForm from './cardPaymentForm';
 
 
 interface params {
@@ -41,6 +42,9 @@ export default function PaymentPopup({cost, username, closeFunc}:params):React.R
 
       <Elements stripe={stripePromise} options={{clientSecret}}>
         <PaymentRequestButton cost={cost} clientSecret={clientSecret} closeFunc={closeFunc} username={username} />
+        <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
+        <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
+        <CardPaymentForm clientSecret={clientSecret} username={username} />
       </Elements>
     </div>
   );
