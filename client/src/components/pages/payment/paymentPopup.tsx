@@ -4,6 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { createPaymentIntent } from './paymentAPI';
 import ExpressCheckout from './expressCheckout';
 import CardPaymentForm from './cardPaymentForm';
+import Popup from '../../multiPageComponents/popup';
 
 
 interface params {
@@ -33,18 +34,20 @@ export default function PaymentPopup({cost, username}:params):React.ReactElement
     }
 
   return (
-    <div className="popupWrapper" id="paymentPopupWrapper">
-      <h2>
-        {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
-      </h2>
-      <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
+    <Popup wrapperId="paymentPopupWrapper">
+      <React.Fragment>
+        <h2>
+          {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
+        </h2>
+        <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
-      <Elements stripe={stripePromise} options={{clientSecret}}>
-        <ExpressCheckout clientSecret={clientSecret} username={username} />
-        <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
-        <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
-        <CardPaymentForm clientSecret={clientSecret} username={username} />
-      </Elements>
-    </div>
+        <Elements stripe={stripePromise} options={{clientSecret}}>
+          <ExpressCheckout clientSecret={clientSecret} username={username} />
+          <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
+          <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
+          <CardPaymentForm clientSecret={clientSecret} username={username} />
+        </Elements>
+      </React.Fragment>
+    </Popup>
   );
 };

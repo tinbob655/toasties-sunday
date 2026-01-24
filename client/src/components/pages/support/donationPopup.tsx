@@ -1,4 +1,5 @@
 import React from 'react';
+import Popup from '../../multiPageComponents/popup';
 
 
 interface params {
@@ -23,40 +24,42 @@ export default function DonationPopup({closeFunc}:params):React.ReactElement {
     };
 
     return (
-        <div className="popupWrapper" id="donationPopupWrapper">
-            <h2>
-                Donate now
-            </h2>
+        <Popup wrapperId="donationPopupWrapper">
+            <React.Fragment>
+                <h2>
+                    Donate now
+                </h2>
 
-            <div className="dividerLine"></div>
+                <div className="dividerLine"></div>
 
-            {/*donation form*/}
-            <form id="donationForm" onSubmit={(event:React.FormEvent) => {closeFunc(event)}}>
+                {/*donation form*/}
+                <form id="donationForm" onSubmit={(event:React.FormEvent) => {closeFunc(event)}}>
 
-                <p className="aboveInput">
-                    Choose amount to donate:
+                    <p className="aboveInput">
+                        Choose amount to donate:
+                    </p>
+                    <input type="number" name="amount" step={0.01} placeholder="Enter donation amount..." min={0.50} required />
+
+                    <input type="submit" value="Donate" />
+                </form>
+
+                <div className="dividerLine"></div>
+
+                {/*remember our hard work section*/}
+                <h2>
+                    Remember all our hard work:
+                </h2>
+                <div style={{display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', alignItems: 'flex-start', marginTop: '12px'}}>
+                    {getWorkImages()}
+                </div>
+                <p>
+                    Probably at least 100 hours goes into making each toasty. From manually farming the spring onions and rearing the pigs to making the cheese and bread, Will and Henry really put in their shift to get insane quality toasties to you. Sounds like you should probably donate loads of money to us...
                 </p>
-                <input type="number" name="amount" step={0.01} placeholder="Enter donation amount..." min={0.50} required />
-
-                <input type="submit" value="Donate" />
-            </form>
-
-            <div className="dividerLine"></div>
-
-            {/*remember our hard work section*/}
-            <h2>
-                Remember all our hard work:
-            </h2>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', alignItems: 'flex-start', marginTop: '12px'}}>
-                {getWorkImages()}
-            </div>
-            <p>
-                Probably at least 100 hours goes into making each toasty. From manually farming the spring onions and rearing the pigs to making the cheese and bread, Will and Henry really put in their shift to get insane quality toasties to you. Sounds like you should probably donate loads of money to us...
-            </p>
-            <img src={new URL('../../../assets/images/tamerlan/4.jpeg', import.meta.url).href} alt="Tamerlan" />
-            <p>
-                Give us donations to avoid enforcement.
-            </p>
-        </div>
+                <img src={new URL('../../../assets/images/tamerlan/4.jpeg', import.meta.url).href} alt="Tamerlan" />
+                <p>
+                    Give us donations to avoid enforcement.
+                </p>
+            </React.Fragment>
+        </Popup>
     );
 };

@@ -1,4 +1,5 @@
 import React, {useRef, useState} from 'react';
+import Popup from '../../multiPageComponents/popup';
 
 
 interface params {
@@ -23,88 +24,90 @@ export default function LoginPopup({closeFunc}:params):React.ReactElement {
     };
 
     return (
-        <div className="popupWrapper" id="loginPopupWrapper">
-            <h2>
-                Log in / sign up
-            </h2>
+        <Popup wrapperId="loginPopupWrapper">
+            <React.Fragment>
+                <h2>
+                    Log in / sign up
+                </h2>
 
-            <div className="dividerLine"></div>
+                <div className="dividerLine"></div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <td>
-                            <button onClick={loginSelected} type="button">
-                                <h3>
-                                    Login
-                                </h3>
-                            </button>
-                        </td>
-                        <td>
-                            <button onClick={signUpSelected} type="button">
-                                <h3>
-                                    Sign up
-                                </h3>
-                            </button>
-                        </td>
-                    </tr>
-                </thead>
-            </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <td>
+                                <button onClick={loginSelected} type="button">
+                                    <h3>
+                                        Login
+                                    </h3>
+                                </button>
+                            </td>
+                            <td>
+                                <button onClick={signUpSelected} type="button">
+                                    <h3>
+                                        Sign up
+                                    </h3>
+                                </button>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
 
-            <div className="formSliderContainer">
-                <div
-                    className="formSlider"
-                    style={{
-                        transform: activeForm === 'login' ? 'translateX(0%)' : 'translateX(-50%)',
-                        transition: 'transform 0.5s cubic-bezier(0.77,0,0.175,1)',
-                    }}
-                >
-                    <div id="loginWrapper" ref={loginWrapper} className="formPanel">
-                        <form id="loginForm" onSubmit={(event) => {closeFunc(event, 'login', setLoginErrorMsg)}}>
-                            <p className="aboveInput">
-                                Enter your name:
-                            </p>
-                            <input name="username" type="text" placeholder="Name..." required />
+                <div className="formSliderContainer">
+                    <div
+                        className="formSlider"
+                        style={{
+                            transform: activeForm === 'login' ? 'translateX(0%)' : 'translateX(-50%)',
+                            transition: 'transform 0.5s cubic-bezier(0.77,0,0.175,1)',
+                        }}
+                    >
+                        <div id="loginWrapper" ref={loginWrapper} className="formPanel">
+                            <form id="loginForm" onSubmit={(event) => {closeFunc(event, 'login', setLoginErrorMsg)}}>
+                                <p className="aboveInput">
+                                    Enter your name:
+                                </p>
+                                <input name="username" type="text" placeholder="Name..." required />
 
-                            <p className="aboveInput">
-                                Enter password:
-                            </p>
-                            <input name="password" type="password" placeholder="Password..." required />
+                                <p className="aboveInput">
+                                    Enter password:
+                                </p>
+                                <input name="password" type="password" placeholder="Password..." required />
 
-                            <p className="errorText">
-                                {loginErrorMsg}
-                            </p>
+                                <p className="errorText">
+                                    {loginErrorMsg}
+                                </p>
 
-                            <input type="submit" value="Submit" style={{marginTop: '20px'}} />
-                        </form>
-                    </div>
+                                <input type="submit" value="Submit" style={{marginTop: '20px'}} />
+                            </form>
+                        </div>
 
-                    <div id="signUpWrapper" ref={signUpWrapper} className="formPanel">
-                        <form id="signUpForm" onSubmit={(event) => {closeFunc(event, 'signUp', setSignUpErrorMsg)}}>
-                            <p className="aboveInput">
-                                Enter your name (please use your actual name so we know who is who):
-                            </p>
-                            <input type="text" name="username" placeholder="Name..." required />
+                        <div id="signUpWrapper" ref={signUpWrapper} className="formPanel">
+                            <form id="signUpForm" onSubmit={(event) => {closeFunc(event, 'signUp', setSignUpErrorMsg)}}>
+                                <p className="aboveInput">
+                                    Enter your name (please use your actual name so we know who is who):
+                                </p>
+                                <input type="text" name="username" placeholder="Name..." required />
 
-                            <p className="aboveInput">
-                                Create password:
-                            </p>
-                            <input type="password" name="password" placeholder="Password..." required />
+                                <p className="aboveInput">
+                                    Create password:
+                                </p>
+                                <input type="password" name="password" placeholder="Password..." required />
 
-                            <p className="aboveInput">
-                                Confirm password:
-                            </p>
-                            <input type="password" name="confirmPassword" placeholder="Password... " required />
+                                <p className="aboveInput">
+                                    Confirm password:
+                                </p>
+                                <input type="password" name="confirmPassword" placeholder="Password... " required />
 
-                            <p className="errorText">
-                                {signUpErrorMsg}
-                            </p>
+                                <p className="errorText">
+                                    {signUpErrorMsg}
+                                </p>
 
-                            <input type="submit" value="Submit" style={{marginTop: '20px'}} />
-                        </form>
+                                <input type="submit" value="Submit" style={{marginTop: '20px'}} />
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </React.Fragment>
+        </Popup>
     );
 }
