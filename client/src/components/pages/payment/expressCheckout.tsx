@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useStripe, ExpressCheckoutElement } from '@stripe/react-stripe-js';
+import { useStripe, useElements, ExpressCheckoutElement } from '@stripe/react-stripe-js';
 import type { StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js';
 import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
@@ -13,14 +13,15 @@ interface params {
 export default function ExpressCheckout({ clientSecret, username }: params): React.ReactElement {
 
     const stripe = useStripe();
+    const elements = useElements();
     const auth = useAuth();
     const [errorMessage, setErrorMessage] = useState<string>('');
 
-    const handleConfirm = useCallback(async (event: StripeExpressCheckoutElementConfirmEvent): Promise<void> => {
-        if (!stripe) return;
+    const handleConfirm = useCallback(async (_event: StripeExpressCheckoutElementConfirmEvent): Promise<void> => {
+        if (!stripe || !elements) return;
 
         const { error } = await stripe.confirmPayment({
-            elements: event.expressPaymentType ? undefined : undefined,
+            elements,
             clientSecret,
             confirmParams: {
                 return_url: window.location.origin + '/paymentCompleted',
@@ -40,7 +41,7 @@ export default function ExpressCheckout({ clientSecret, username }: params): Rea
                 });
             }
         }
-    }, [stripe, clientSecret, username, auth.username]);
+    }, [stripe, elements, clientSecret, username, auth.username]);
 
     return (
         <div>
