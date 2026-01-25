@@ -108,6 +108,130 @@ export default function Admin():React.ReactElement {
         };
     }, [orders]);
 
+
+    function getIngredients(): React.ReactElement {
+        // Aggregate counts across all paid orders
+        const ingredientCounts: Map<string, number> = new Map();
+        let totalToasties = 0;
+        let totalDrinks = 0;
+        let totalWaffles = 0;
+
+        orders.forEach((order) => {
+            if (!order.paid) return;
+
+            // Count toasties and their ingredients
+            if (order.toasties && order.toasties.length > 0) {
+                order.toasties.forEach((item) => {
+                    if (item === 'NEW TOASTY') {
+                        totalToasties++;
+                    } else {
+                        ingredientCounts.set(item, (ingredientCounts.get(item) || 0) + 1);
+                    }
+                });
+            }
+
+            // Count drinks
+            if (order.drinks && order.drinks.length > 0) {
+                order.drinks.forEach((drink) => {
+                    totalDrinks++;
+                    ingredientCounts.set(drink, (ingredientCounts.get(drink) || 0) + 1);
+                });
+            }
+
+            // Count waffles (deserts) and their toppings
+            if (order.deserts && order.deserts.length > 0) {
+                order.deserts.forEach((item) => {
+                    if (item === 'NEW DESERT') {
+                        totalWaffles++;
+                    } else {
+                        ingredientCounts.set(item, (ingredientCounts.get(item) || 0) + 1);
+                    }
+                });
+            }
+        });
+
+        // Build the JSX
+        const toastyIngredients: React.ReactElement[] = [];
+        const drinkItems: React.ReactElement[] = [];
+        const waffleIngredients: React.ReactElement[] = [];
+
+        // Separate ingredients by category (we need to identify which belong to which)
+        // For simplicity, we'll group toasty ingredients, drink items, and waffle toppings
+        // Since drinks are standalone items, we list them separately
+        // Toasty and waffle ingredients are extras
+
+        ingredientCounts.forEach((count, ingredient) => {
+            // Check if it's a drink by seeing if it appears in the drinks arrays
+            const isDrink = orders.some(
+                (order) => order.paid && order.drinks && order.drinks.includes(ingredient)
+            );
+            const isToastyIngredient = orders.some(
+                (order) =>
+                    order.paid &&
+                    order.toasties &&
+                    order.toasties.includes(ingredient) &&
+                    ingredient !== 'NEW TOASTY'
+            );
+            const isWaffleIngredient = orders.some(
+                (order) =>
+                    order.paid &&
+                    order.deserts &&
+                    order.deserts.includes(ingredient) &&
+                    ingredient !== 'NEW DESERT'
+            );
+
+            if (isDrink) {
+                drinkItems.push(
+                    <li key={`drink-${ingredient}`}>{count}x {ingredient}</li>
+                );
+            }
+            if (isToastyIngredient) {
+                toastyIngredients.push(
+                    <li key={`toasty-ing-${ingredient}`}>{count}x {ingredient}</li>
+                );
+            }
+            if (isWaffleIngredient) {
+                waffleIngredients.push(
+                    <li key={`waffle-ing-${ingredient}`}>{count}x {ingredient}</li>
+                );
+            }
+        });
+
+        return (
+            <ul className="alignLeft">
+                {totalToasties > 0 && (
+                    <>
+                        <li style={{ listStyle: 'none' }}><strong>{totalToasties}x Toasty</strong></li>
+                        <ul style={{ marginLeft: '20px' }}>
+                            {toastyIngredients}
+                        </ul>
+                    </>
+                )}
+                {totalToasties > 0 && totalDrinks > 0 && <br />}
+                {totalDrinks > 0 && (
+                    <>
+                        <li style={{ listStyle: 'none' }}><strong>{totalDrinks}x Drink</strong></li>
+                        <ul style={{ marginLeft: '20px' }}>
+                            {drinkItems}
+                        </ul>
+                    </>
+                )}
+                {(totalToasties > 0 || totalDrinks > 0) && totalWaffles > 0 && <br />}
+                {totalWaffles > 0 && (
+                    <>
+                        <li style={{ listStyle: 'none' }}><strong>{totalWaffles}x Waffle</strong></li>
+                        <ul style={{ marginLeft: '20px' }}>
+                            {waffleIngredients}
+                        </ul>
+                    </>
+                )}
+                {totalToasties === 0 && totalDrinks === 0 && totalWaffles === 0 && (
+                    <li>No paid orders yet.</li>
+                )}
+            </ul>
+        );
+    };
+
     return (
         <React.Fragment>
             <PageHeader title="Admin" subtitle="This is the admin page!" />
@@ -117,6 +241,7 @@ export default function Admin():React.ReactElement {
                 <React.Fragment>
 
                     {/*the user is sudo*/}
+                    {/*orders section*/}
                     <div className="card card-right">
                         <h2 className="alignRight">
                             Hello, Admin {username}
@@ -127,6 +252,14 @@ export default function Admin():React.ReactElement {
                         <ul className="alignLeft">
                             {ordersHTML}
                         </ul>
+                    </div>
+
+                    {/*ingredients section*/}
+                    <div className="card card-left">
+                        <h2 className="alignLeft">
+                            Ingredients required:
+                        </h2>
+                        {getIngredients()}
                     </div>
                 </React.Fragment>
             ) : (
