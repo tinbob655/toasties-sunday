@@ -22,6 +22,10 @@
                 "cost": 0.08
             },
             {
+                "name": "Marmite",
+                "cost": 0.02
+            },
+            {
                 "name": "Herbs",
                 "cost": 0.01
             }
