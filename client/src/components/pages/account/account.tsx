@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
@@ -8,7 +8,19 @@ import { logOut, handleLogin, handleSignUp } from './accountAPI';
 export default function Account():React.ReactElement {
 
     const {loggedIn, username, refreshAuth} = useAuth();
+    const [sudo, setSudo] = useState<boolean>(false);
     const [loginPopup, setLoginPopup] = useState<React.ReactElement>(<></>);
+
+    //see if the user is sudo
+    useEffect(() => {
+        if (!loggedIn) {
+            setSudo(false);
+        }
+        else {
+            const sudoUsers:string[] = import.meta.env.VITE_SUDO_USERS.split(',');
+            setSudo(sudoUsers.includes(username));
+        };
+    }, [username]);
 
 
     async function loginPopupSubmitted(event: React.FormEvent, type: string, setErrorMsg: (msg: string) => void) {
@@ -86,6 +98,18 @@ export default function Account():React.ReactElement {
                         </p>
                         <FancyButton text="Log out here" transformOrigin="left" action={() => {handleLogOut()}} />
                     </div>
+
+                    {sudo ? (
+                        <div className="card card-left">
+                            <h2 className="alignLeft">
+                                Hello, admin {username}
+                            </h2>
+                            <p className="alignLeft">
+                                The system detected you as an admin!
+                            </p>
+                            <FancyButton text="View the admin page here!" transformOrigin="left" destination="/admin" />
+                        </div>
+                    ) : <></>}
                 </React.Fragment>
             ) : (
                 <React.Fragment>
