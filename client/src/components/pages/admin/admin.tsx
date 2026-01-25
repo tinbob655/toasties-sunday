@@ -93,10 +93,10 @@ export default function Admin():React.ReactElement {
                 if (order.paid) {
                     tempOrdersHTML.push(
                         <React.Fragment key={order.username}>
+                            <br/>
                             <li style={{marginBottom: '15px', listStyle: 'none'}}>
                                 <strong>{order.username}</strong>
                             </li>
-                            <br/>
                             {formatOrderItems(order.toasties || [], 'NEW TOASTY', 'Toasty')}
                             {formatDrinks(order.drinks || [])}
                             {formatOrderItems(order.deserts || [], 'NEW DESERT', 'Waffle')}
