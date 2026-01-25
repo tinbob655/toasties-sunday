@@ -34,7 +34,7 @@ export async function placeOrder(data: { username: string; cost: number; toastie
     //the user cannot make orders between 13:00 and 21:59 on a Sunday.
     const DISABLE_TIMECHECK = import.meta.env.VITE_DISABLE_ORDERS_TIMECHECK;
     const currentTime: Date = new Date();
-    if (DISABLE_TIMECHECK == 'false' && currentTime.getDay() === 0 && currentTime.getHours() >= 15 && currentTime.getHours() < 22) {
+    if (DISABLE_TIMECHECK == 'false' && currentTime.getDay() === 0 && currentTime.getHours() >= 14 && currentTime.getHours() < 22) {
 
         //invalid time to make an order
         throw new Error("Orders cannot be placed between 1:00 PM and 9:59 PM on Sundays.");
