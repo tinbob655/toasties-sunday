@@ -141,13 +141,29 @@ router.delete('/deleteOrder/:username', async (req, res) => {
       return res.status(400).json({error: "Did not receive a username"});
     };
 
-    //delete the order
-    const deleted = await Purchase.destroy({ where: { username } });
+    //attempt to delete the order
+    const deleted = await Purchase.destroy({ where: { username, paid: false } });
     if (deleted) {
       return res.status(200).json({});
-    }
+    } 
 
     else {
+      
+      //if we failed to delete the order, then either we can't find it or it was already paid for
+      const order = await Purchase.findByPk(username);
+      if (!order) {
+
+        //if we can't find the order
+        return res.status(404).json({error: "Order not found"});
+      };
+
+      if (order.paid) {
+
+        //if the order has been paid for
+        return res.status(403).json({error: "Cannot delete a paid order"});
+      };
+
+      //other errors
       return res.status(404).json({error: "Failed to delete order"});
     };
   }
@@ -182,8 +198,13 @@ router.put('/editOrder/:username', async (req, res) => {
     if (!oldOrder) {
       return res.status(400).json({error: `Could not find an order associated with username: ${username}`});
     };
+
+    //if the old order was paid for we cannot edit it
+    if (oldOrder.paid) {
+      return res.status(403).json({error: "Cannot edit an order which has already been paid for"});
+    };
   
-    //update the values
+    //otherwise, update the order
     ['toasties', 'drinks', 'deserts'].forEach(key => {
       if (oldOrder[key] != req.body[key]) {
         oldOrder[key] = req.body[key];
@@ -191,9 +212,11 @@ router.put('/editOrder/:username', async (req, res) => {
     });
     oldOrder.cost = newCost;
 
+    //save the order
     await oldOrder.save();
     return res.status(200).json(oldOrder);
   }
+
   catch (err) {
     return res.status(500).json({error: err.message});
   };

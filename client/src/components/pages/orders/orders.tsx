@@ -147,7 +147,7 @@ export default function Orders():React.ReactElement {
                         {userOrder?.paid ? (
                             <React.Fragment>
                                 <p className="alignRight">
-                                    You've paid for your order!
+                                    You've paid for your order! You will be able to edit it again next week.
                                 </p>
                             </React.Fragment>
                         ) : (
@@ -167,27 +167,24 @@ export default function Orders():React.ReactElement {
                                         }, 10);
                                     }} />
                                 </div>
+
+                                {/*remove order button*/}
+                                <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
+
+                                {/*edit order button*/}
+                                <div style={{marginTop: '20px'}}>
+                                    <FancyButton text="Change your order" transformOrigin="left" action={() => {
+                                        setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMessage: Function) => {changeOrder(event, setErrorMessage)}} />);
+                                        setTimeout(() => {
+                                            document.getElementById('orderPopupWrapper')?.classList.add('shown');
+                                        }, 10);
+                                    }} />
+                                </div>
+                                <p className="errorText">
+                                    {removeOrderError}
+                                </p>
                             </React.Fragment>
                         )}
-
-                        {/*remove order button*/}
-                        <FancyButton text="Remove your order" transformOrigin="left" action={removeOrder} />
-
-                        {/*edit order button*/}
-                        <div style={{marginTop: '20px'}}>
-                            <FancyButton text="Change your order" transformOrigin="left" action={() => {
-                                setOrderPopup(<OrderPopup closeFunc={(event:React.FormEvent, setErrorMessage: Function) => {changeOrder(event, setErrorMessage)}} />);
-                                setTimeout(() => {
-                                    document.getElementById('orderPopupWrapper')?.classList.add('shown');
-                                }, 10);
-                            }} />
-                        </div>
-
-
-
-                        <p className="errorText">
-                            {removeOrderError}
-                        </p>
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
