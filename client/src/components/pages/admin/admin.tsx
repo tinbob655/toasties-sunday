@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../../multiPageComponents/pageHeader';
 import { useAuth } from '../../../context/authContext';
 import GenericTextSection from '../../multiPageComponents/genericTextSection';
 import { getOrders } from '../orders/ordersAPI';
-import type { orderObj } from '../orders/orderObj';
 
 
-// Helper to format order items nicely
+//helper to format order items nicely
 function formatOrderItems(items: string[], marker: string, label: string): React.ReactElement[] {
     const result: React.ReactElement[] = [];
     let currentGroup: string[] = [];
@@ -54,7 +54,6 @@ export default function Admin():React.ReactElement {
 
     const {loggedIn, username} = useAuth();
     const [sudo, setSudo] = useState<boolean>(false);
-    const [orders, setOrders] = useState<orderObj[]>([]);
     const [ordersHTML, setOrdersHTML] = useState<React.ReactElement[]>([]);
 
     //see if the user is sudo
@@ -69,14 +68,13 @@ export default function Admin():React.ReactElement {
     }, [username]);
 
 
-    //fetch all the orders if we detect a sudo user
-    useEffect(() => {
-        if (sudo) {
-            getOrders().then((res) => {
-                setOrders(res);
-            });
-        };
-    }, [sudo]);
+    //use React Query to fetch and cache all orders
+    const { data: orders = [] } = useQuery({
+        queryKey: ['allOrders'],
+        queryFn: getOrders,
+        enabled: sudo, //only fetch when user is sudo
+        staleTime: 2 * 60 * 1000, //consider data fresh for 2 minutes
+    });
 
     
     //when we get orders, update the frontend

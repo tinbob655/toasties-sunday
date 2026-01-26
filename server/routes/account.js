@@ -114,23 +114,7 @@ router.post('/usernameExists', async (req, res) => {
     res.json({ exists: !!user });
 });
 
-
-//query if a user is sudo
-router.get('/querySudo', (req, res) => {
-    const sudoUsers = process.env.SUDO_USERS.split(',');
-    let username;
-    if (req.session && req.session.user) {
-        username = req.session.user.username;
-    };
-
-    if (!username) {
-        return res.status(401).json({message: "No username received"});
-    };
-    res.json({
-        sudo: sudoUsers.includes(username),
-    });
-});
-
+//note: sudo check is handled client-side via VITE_SUDO_USERS env var to avoid unnecessary API calls
 
 function validatePassword(password) {
 

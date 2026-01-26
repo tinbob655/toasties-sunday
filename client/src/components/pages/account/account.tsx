@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import PageHeader from '../../multiPageComponents/pageHeader';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
@@ -8,6 +9,7 @@ import { logOut, handleLogin, handleSignUp } from './accountAPI';
 export default function Account():React.ReactElement {
 
     const {loggedIn, username, refreshAuth} = useAuth();
+    const queryClient = useQueryClient();
     const [sudo, setSudo] = useState<boolean>(false);
     const [loginPopup, setLoginPopup] = useState<React.ReactElement>(<></>);
 
@@ -44,13 +46,13 @@ export default function Account():React.ReactElement {
 
                 //sign up
                 await handleSignUp(target.username.value, target.password.value);
-                await refreshAuth();
+                await refreshAuth(true);
             } 
             else {
 
                 //login
                 await handleLogin(target.username.value, target.password.value);
-                await refreshAuth();
+                await refreshAuth(true);
             };
 
             //close the popup on success
@@ -78,7 +80,11 @@ export default function Account():React.ReactElement {
 
     async function handleLogOut() {
         await logOut();
-        await refreshAuth();
+
+        //clear cached order data and force auth refresh
+        queryClient.removeQueries({ queryKey: ['userOrder'] });
+        queryClient.removeQueries({ queryKey: ['allOrders'] });
+        await refreshAuth(true);
     };
     
     return (

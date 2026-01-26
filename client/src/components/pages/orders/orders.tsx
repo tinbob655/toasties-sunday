@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '../../multiPageComponents/pageHeader';
 import { getOrder, placeOrder, deleteOrder, editOrder, extractCost } from './ordersAPI';
 import { extractOrderItems } from './ordersAPI';
 import { useAuth } from '../../../context/authContext';
 import FancyButton from '../../multiPageComponents/fancyButton';
 import OrderPopup from './orderPopup/orderPopup';
-import type { orderObj } from './orderObj';
 import PaymentPopup from '../payment/paymentPopup';
 import { useNavigate } from 'react-router';
 
@@ -14,30 +14,21 @@ export default function Orders():React.ReactElement {
 
     const {loggedIn, username} = useAuth();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    const [alreadyOrdered, setAlreadyOrdered] = useState<boolean>(false);
     const [orderPopup, setOrderPopup] = useState<React.ReactElement>(<></>);
-    const [userOrder, setUserOrder] = useState<orderObj|null>(null);
     const [removeOrderError, setRemoveOrderError] = useState<string>('');
     const [paymentPopup, setPaymentPopup] = useState<React.ReactElement>(<></>);
 
+    //use React Query to fetch and cache the user's order
+    const { data: userOrder, isLoading: orderLoading } = useQuery({
+        queryKey: ['userOrder', username],
+        queryFn: () => getOrder(username),
+        enabled: loggedIn && !!username, //only fetch when logged in
+        staleTime: 5 * 60 * 1000, //consider data fresh for 5 minutes
+    });
 
-    //see if the user has already placed an order this week
-    useEffect(() => {
-        if (loggedIn) {
-            getOrder(username).then((res) => {
-                if (res) {
-
-                    //the user has already made an order
-                    setAlreadyOrdered(true);
-                    setUserOrder(res);
-                }
-                else {
-                    setAlreadyOrdered(false);
-                };
-            });
-        };
-    }, [loggedIn]);
+    const alreadyOrdered = !!userOrder;
 
 
     //handle the user creating a new order
@@ -56,8 +47,9 @@ export default function Orders():React.ReactElement {
                 drinks,
                 deserts,
             });
-            setAlreadyOrdered(true);
-            setUserOrder(res);
+
+            //invalidate and update the cache with the new order
+            queryClient.setQueryData(['userOrder', username], res);
 
             //close the popup
             document.getElementById('orderPopupWrapper')?.classList.remove('shown');
@@ -86,8 +78,9 @@ export default function Orders():React.ReactElement {
 
         //if we manage to delete the order successfully
         if (res === '') {
-            setAlreadyOrdered(false);
-            setUserOrder(null);
+
+            //clear the cached order
+            queryClient.setQueryData(['userOrder', username], null);
         }
         
         //if we couldn't delete the order
@@ -113,7 +106,9 @@ export default function Orders():React.ReactElement {
                 drinks,
                 deserts,
             });
-            setUserOrder(res);
+
+            //update the cache with the edited order
+            queryClient.setQueryData(['userOrder', username], res);
 
             //close the popup
             document.getElementById('orderPopupWrapper')?.classList.remove('shown');
@@ -125,6 +120,18 @@ export default function Orders():React.ReactElement {
             setErrorMsg(err);
         };
     };
+
+    //show loading state while fetching order
+    if (loggedIn && orderLoading) {
+        return (
+            <React.Fragment>
+                <PageHeader title="Orders" subtitle="Get it while its going" />
+                <div className="card card-right">
+                    <p>Loading your order...</p>
+                </div>
+            </React.Fragment>
+        );
+    }
 
     return (
         <React.Fragment>

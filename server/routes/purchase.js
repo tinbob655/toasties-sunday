@@ -66,11 +66,34 @@ Purchase.init(
 );
 
 
-//get all orders
+//get all orders (with optional pagination)
 router.get('/getOrders', async (req, res) => {
   try {
-    const orders = await Purchase.findAll();
-    return res.status(200).json(orders);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const offset = (page - 1) * limit;
+
+    //if no pagination params provided, return all (backwards compatible)
+    if (!req.query.page && !req.query.limit) {
+      const orders = await Purchase.findAll();
+      return res.status(200).json(orders);
+    }
+
+    const { count, rows: orders } = await Purchase.findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+    });
+
+    return res.status(200).json({
+      orders,
+      pagination: {
+        page,
+        limit,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+      },
+    });
   }
   catch (err) {
     res.status(500).json({ error: err.message });

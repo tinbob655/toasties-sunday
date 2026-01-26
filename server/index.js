@@ -1,10 +1,13 @@
-// Load environment variables FIRST
+//load environment variables FIRST
 require('dotenv').config();
 
-// Ensure database tables are created
+//ensure database tables are created
 const sequelize = require('./sequelize');
 const SequelizeStore = require('connect-session-sequelize')(require('express-session').Store);
-sequelize.sync({ alter: true }).then(() => {
+const isProduction = process.env.NODE_ENV === 'production';
+
+//in production, use force: false to avoid schema changes. Use migrations for production schema updates.
+sequelize.sync({ alter: !isProduction }).then(() => {
   console.log('Database synced successfully');
 }).catch(err => {
   console.error('Database sync error:', err);
@@ -15,7 +18,7 @@ const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
 
-// Use Sequelize for session storage (works with MySQL on Railway)
+//use Sequelize for session storage (works with MySQL on Railway)
 const sessionStore = new SequelizeStore({
   db: sequelize,
 });
@@ -25,7 +28,7 @@ const app = express();
 
 const bodyParser = require('body-parser');
 
-// Trust first proxy (needed for secure cookies behind reverse proxies)
+//trust first proxy (needed for secure cookies behind reverse proxies)
 app.set('trust proxy', 1);
 app.use(cors({
   origin: true,
@@ -37,7 +40,6 @@ app.use(express.json());
 
 //will save login sessions
 const sessionLengthDays = 7;
-const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   store: sessionStore,
   secret: process.env.SESSION_SECRET,
