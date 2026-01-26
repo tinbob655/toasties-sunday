@@ -146,10 +146,10 @@ export default function Orders():React.ReactElement {
                         <h2 className="alignRight">
 
                             {/*secret tamerlan button*/}
-                            <span onDoubleClick={() => {navigate('/tamerlan')}} style={{color:  '#94bb92'}} >
-                                Y
+                            <span onDoubleClick={() => {navigate('/tamerlan')}} style={{color:  '#a1b6a0', cursor: 'pointer'}} >
+                                W
                             </span>
-                            ou have already ordered, {userOrder?.username}!
+                            e have your order, {userOrder?.username}!
                         </h2>
                         {userOrder?.paid ? (
                             <React.Fragment>
