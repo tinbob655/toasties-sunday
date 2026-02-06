@@ -102,9 +102,9 @@ export function extractCost(form: HTMLFormElement, setErrorMsg: Function): numbe
     return cost;
 }
 
-//mark an order as paid
-export async function payOrder(username: string):Promise<orderObj> {
-    const res = (await axios.put(`/api/db/order/payOrder/${encodeURIComponent(username)}`)).data;
+//mark an order as paid (requires payment intent verification)
+export async function payOrder(username: string, paymentIntentId: string):Promise<orderObj> {
+    const res = (await axios.put(`/api/db/order/payOrder/${encodeURIComponent(username)}`, { paymentIntentId })).data;
     return res;
 };
 

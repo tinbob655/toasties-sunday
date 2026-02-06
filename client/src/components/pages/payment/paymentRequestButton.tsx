@@ -9,9 +9,10 @@ interface params {
     clientSecret: string,
     closeFunc: Function,
     username: string,
+    paymentIntentId: string,
 };
 
-export default function PaymentRequestButton({ cost, clientSecret, closeFunc, username }: params): React.ReactElement {
+export default function PaymentRequestButton({ cost, clientSecret, closeFunc, username, paymentIntentId }: params): React.ReactElement {
 
     const stripe = useStripe();
     const auth = useAuth();
@@ -63,8 +64,10 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc, us
                 if (username === 'NO_NAME') {
                     window.location.href = '/paymentCompleted';
                 } else {
-                    payOrder(auth.username).then(() => {
+                    payOrder(auth.username, paymentIntentId).then(() => {
                         window.location.href = '/paymentCompleted';
+                    }).catch((err) => {
+                        setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                     });
                 }
             }
@@ -81,8 +84,10 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc, us
                     if (username === 'NO_NAME') {
                         window.location.href = '/paymentCompleted';
                     } else {
-                        payOrder(auth.username).then(() => {
+                        payOrder(auth.username, paymentIntentId).then(() => {
                             window.location.href = '/paymentCompleted';
+                        }).catch((err) => {
+                            setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                         });
                     }
                 };
@@ -93,7 +98,7 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc, us
             };
         });
 
-    }, [stripe, clientSecret, cost, closeFunc]);
+    }, [stripe, clientSecret, cost, closeFunc, paymentIntentId]);
 
     if (!canMakePayment) {
         return (
@@ -121,8 +126,10 @@ export default function PaymentRequestButton({ cost, clientSecret, closeFunc, us
             if (username === 'NO_NAME') {
                 window.location.href = '/paymentCompleted';
             } else {
-                payOrder(auth.username).then(() => {
+                payOrder(auth.username, paymentIntentId).then(() => {
                     window.location.href = '/paymentCompleted';
+                }).catch((err) => {
+                    setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                 });
             }
         }

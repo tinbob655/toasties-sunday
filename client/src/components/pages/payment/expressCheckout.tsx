@@ -8,9 +8,10 @@ import { useAuth } from '../../../context/authContext';
 interface params {
     clientSecret: string,
     username: string,
+    paymentIntentId: string,
 };
 
-export default function ExpressCheckout({ clientSecret, username }: params): React.ReactElement {
+export default function ExpressCheckout({ clientSecret, username, paymentIntentId }: params): React.ReactElement {
 
     const stripe = useStripe();
     const elements = useElements();
@@ -36,12 +37,14 @@ export default function ExpressCheckout({ clientSecret, username }: params): Rea
             if (username === 'NO_NAME') {
                 window.location.href = '/paymentCompleted';
             } else {
-                payOrder(auth.username).then(() => {
+                payOrder(auth.username, paymentIntentId).then(() => {
                     window.location.href = '/paymentCompleted';
+                }).catch((err) => {
+                    setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                 });
             }
         }
-    }, [stripe, elements, clientSecret, username, auth.username]);
+    }, [stripe, elements, clientSecret, username, auth.username, paymentIntentId]);
 
     return (
         <div>

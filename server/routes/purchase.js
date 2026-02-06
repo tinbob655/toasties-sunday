@@ -2,6 +2,7 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../sequelize');
 const express = require('express');
 const router = express.Router();
+const { requireAuth, requireOwnerOrAdmin, requireAdmin } = require('../middleware/auth');
 
 class Purchase extends Model {}
 Purchase.init(
@@ -66,8 +67,8 @@ Purchase.init(
 );
 
 
-//get all orders (with optional pagination)
-router.get('/getOrders', async (req, res) => {
+//get all orders (with optional pagination) - ADMIN ONLY
+router.get('/getOrders', requireAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 50;
@@ -101,8 +102,8 @@ router.get('/getOrders', async (req, res) => {
 });
 
 
-//get a specific order based on username
-router.get('/getOrder/:username', async (req, res) => {
+//get a specific order based on username - owner or admin only
+router.get('/getOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
     const order = await Purchase.findByPk(req.params.username);
 
@@ -119,8 +120,8 @@ router.get('/getOrder/:username', async (req, res) => {
 });
 
 
-//create a new order
-router.post('/createNewOrder/:username', async (req, res) => {
+//create a new order - owner or admin only
+router.post('/createNewOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
 
     //make sure we have a username
@@ -154,8 +155,8 @@ router.post('/createNewOrder/:username', async (req, res) => {
 })
 
 
-//delete an order based on username
-router.delete('/deleteOrder/:username', async (req, res) => {
+//delete an order based on username - owner or admin only
+router.delete('/deleteOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
     const username = req.params.username;
 
@@ -197,8 +198,8 @@ router.delete('/deleteOrder/:username', async (req, res) => {
 });
 
 
-//edit an order based on username
-router.put('/editOrder/:username', async (req, res) => {
+//edit an order based on username - owner or admin only
+router.put('/editOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
 
     //make sure we have a username
@@ -246,25 +247,60 @@ router.put('/editOrder/:username', async (req, res) => {
 });
 
 
-//mark an order as paid
-router.put('/payOrder/:username', async (req, res) => {
+//mark an order as paid - requires verified payment intent
+router.put('/payOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
 
   try {
-
-    //make sure we have a username
+    const { paymentIntentId } = req.body;
     const username = req.params.username;
+    const sessionUsername = req.session.user.username;
+    
+    //make sure we have a username
     if (!username) {
       return res.status(400).json({error: "Did not receive a username"});
     };
+
+    //make sure we have a payment intent ID to verify
+    if (!paymentIntentId) {
+      return res.status(400).json({error: "Payment intent ID is required to mark order as paid"});
+    };
+
+    //verify the payment with Stripe
+    const stripe = require('stripe')(process.env.STRIPE_SK);
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    //check payment status
+    if (paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({error: `Payment not completed. Status: ${paymentIntent.status}`});
+    };
+    
+    //verify the payment belongs to the order's user (from metadata)
+    if (paymentIntent.metadata.username !== username) {
+      return res.status(403).json({error: "Payment does not match this order"});
+    };
+    
+    //check if user is allowed (either admin, or the owner making their own payment)
+    const adminUsers = (process.env.SUDO_USERS || '').split(',').map(u => u.trim());
+    const isAdmin = adminUsers.includes(sessionUsername);
+    const isOwner = sessionUsername === username;
+    
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({error: "You cannot mark someone else's order as paid"});
+    };
   
-    //we have a username, mark the order as paid
-    //get the old order
+    //get the order
     const oldOrder = await Purchase.findByPk(username);
     if (!oldOrder) {
       return res.status(400).json({error: `Could not find an order associated with username: ${username}`});
     };
+
+    //verify the payment amount matches the order cost (within rounding tolerance)
+    const paidAmount = paymentIntent.amount / 100; // Convert from pence
+    if (Math.abs(paidAmount - parseFloat(oldOrder.cost)) > 0.01) {
+      return res.status(400).json({error: `Payment amount (£${paidAmount}) does not match order cost (£${oldOrder.cost})`});
+    };
   
-    //edit the order
+    //payment verified - mark order as paid
     oldOrder.paid = true;
     await oldOrder.save();
     return res.status(200).json(oldOrder);

@@ -15,12 +15,14 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 export default function PaymentPopup({cost, username}:params):React.ReactElement {
 
     const [clientSecret, setClientSecret] = useState<string>('');
+    const [paymentIntentId, setPaymentIntentId] = useState<string>('');
 
 
-    //get the client secret
+    //get the client secret and payment intent ID
     useEffect(() => {
         createPaymentIntent(cost).then((res) => {
-          setClientSecret(res);
+          setClientSecret(res.clientSecret);
+          setPaymentIntentId(res.paymentIntentId);
         });
     }, [cost]);
 
@@ -41,10 +43,10 @@ export default function PaymentPopup({cost, username}:params):React.ReactElement
         <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
         <Elements stripe={stripePromise} options={{clientSecret}}>
-          <ExpressCheckout clientSecret={clientSecret} username={username} />
+          <ExpressCheckout clientSecret={clientSecret} username={username} paymentIntentId={paymentIntentId} />
           <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
           <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
-          <CardPaymentForm clientSecret={clientSecret} username={username} />
+          <CardPaymentForm clientSecret={clientSecret} username={username} paymentIntentId={paymentIntentId} />
         </Elements>
       </React.Fragment>
     </div>

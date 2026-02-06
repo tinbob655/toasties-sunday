@@ -17,6 +17,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+const { generalLimiter, paymentLimiter } = require('./middleware/rateLimit');
 
 //use Sequelize for session storage (works with MySQL on Railway)
 const sessionStore = new SequelizeStore({
@@ -59,6 +60,9 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 
 // routes
+//apply general rate limiting to all API routes
+app.use('/api', generalLimiter);
+
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from backend!' });
 });
@@ -70,7 +74,7 @@ const purchaseRouter = require('./routes/purchase');
 app.use('/api/db/order', purchaseRouter);
 
 const paymentRouter = require('./routes/payment');
-app.use('/api/payment', paymentRouter);
+app.use('/api/payment', paymentLimiter, paymentRouter);
 
 
 

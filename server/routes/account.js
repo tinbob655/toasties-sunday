@@ -5,6 +5,7 @@ const sequelize = require('../sequelize');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const upload = multer();
+const { authLimiter } = require('../middleware/rateLimit');
 
 
 
@@ -27,7 +28,7 @@ router.get('/queryLoggedIn', (req, res) => {
 
 
 //create a new account
-router.post('/createAccount', upload.none(), async (req, res) => {
+router.post('/createAccount', authLimiter, upload.none(), async (req, res) => {
     const {username, password} = req.body;
 
     //make sure we have a username, password
@@ -71,7 +72,7 @@ router.post('/createAccount', upload.none(), async (req, res) => {
 
 
 //log a new user in
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
     const {username, password} = req.body;
 
     //make sure we got a username and a password
