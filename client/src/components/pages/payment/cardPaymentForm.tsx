@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
+import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
+import { createPaymentIntent } from './paymentAPI';
 import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
 
 
 interface params {
-    clientSecret: string,
+    cost: number,
     username: string,
-    paymentIntentId: string,
 };
 
-export default function CardPaymentForm({ clientSecret, username, paymentIntentId }: params): React.ReactElement {
+export default function CardPaymentForm({ cost, username }: params): React.ReactElement {
 
     const stripe = useStripe();
     const elements = useElements();
@@ -29,87 +29,66 @@ export default function CardPaymentForm({ clientSecret, username, paymentIntentI
         setIsProcessing(true);
         setErrorMessage('');
 
-        const cardNumberElement = elements.getElement(CardNumberElement);
-
-        if (!cardNumberElement) {
-            setErrorMessage('Card element not found.');
+        // Validate the card input
+        const { error: submitError } = await elements.submit();
+        if (submitError) {
+            setErrorMessage(submitError.message || 'Validation failed.');
             setIsProcessing(false);
             return;
         }
 
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardNumberElement,
+        // Create PaymentIntent on the server (deferred intent pattern)
+        let clientSecret: string;
+        let paymentIntentId: string;
+        try {
+            const res = await createPaymentIntent(cost);
+            clientSecret = res.clientSecret;
+            paymentIntentId = res.paymentIntentId;
+        } catch (err: any) {
+            setErrorMessage(err.response?.data?.error || 'Failed to create payment.');
+            setIsProcessing(false);
+            return;
+        }
+
+        // Confirm the payment with Stripe
+        const { error } = await stripe.confirmPayment({
+            elements,
+            clientSecret,
+            confirmParams: {
+                return_url: window.location.origin + '/paymentCompleted',
             },
+            redirect: 'if_required',
         });
 
         if (error) {
             setErrorMessage(error.message || 'Payment failed.');
             setIsProcessing(false);
-        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        } else {
             // Skip database update for anonymous users
             if (username === 'NO_NAME') {
                 window.location.href = '/paymentCompleted';
             } else {
                 payOrder(auth.username, paymentIntentId).then(() => {
                     window.location.href = '/paymentCompleted';
-                }).catch((err) => {
+                }).catch((err: any) => {
                     setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                     setIsProcessing(false);
                 });
             }
-        } else {
-            setErrorMessage('Payment failed. Please try again.');
-            setIsProcessing(false);
         }
     }
 
-    const elementStyle = {
-        style: {
-            base: {
-                fontSize: '16px',
-                color: '#fff',
-                fontFamily: '"Mulish", sans-serif',
-                '::placeholder': {
-                    color: '#aab7c4',
-                },
-            },
-            invalid: {
-                color: '#fa755a',
-                iconColor: '#fa755a',
-            },
-        },
-    };
-
-    const inputWrapperStyle = {
-        background: 'rgba(30, 34, 44, 0.7)',
-        border: '1.5px solid #fff',
-        borderRadius: '8px',
-        padding: '12px',
-        marginBottom: '10px',
-    };
-
     return (
         <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-            <p className="aboveInput" style={{ marginTop: '0' }}>
-                Enter your card details:
-            </p>
-            <div style={inputWrapperStyle}>
-                <CardNumberElement options={{ ...elementStyle, showIcon: true }} />
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ ...inputWrapperStyle, flex: 1 }}>
-                    <CardExpiryElement options={elementStyle} />
-                </div>
-                <div style={{ ...inputWrapperStyle, flex: 1 }}>
-                    <CardCvcElement options={elementStyle} />
-                </div>
-            </div>
+            <PaymentElement options={{
+                wallets: { applePay: 'never', googlePay: 'never' },
+            }} />
             {errorMessage && <p className="errorText">{errorMessage}</p>}
             <input
                 type="submit"
                 value={isProcessing ? 'Processing...' : 'Pay with Card'}
                 disabled={!stripe || isProcessing}
+                style={{marginTop: '20px'}}
             />
         </form>
     );

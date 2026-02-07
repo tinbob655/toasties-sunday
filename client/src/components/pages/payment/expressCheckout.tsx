@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { useStripe, useElements, ExpressCheckoutElement } from '@stripe/react-stripe-js';
 import type { StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js';
+import { createPaymentIntent } from './paymentAPI';
 import { payOrder } from '../orders/ordersAPI';
 import { useAuth } from '../../../context/authContext';
 
 
 interface params {
-    clientSecret: string,
+    cost: number,
     username: string,
-    paymentIntentId: string,
 };
 
-export default function ExpressCheckout({ clientSecret, username, paymentIntentId }: params): React.ReactElement {
+export default function ExpressCheckout({ cost, username }: params): React.ReactElement {
 
     const stripe = useStripe();
     const elements = useElements();
@@ -21,6 +21,26 @@ export default function ExpressCheckout({ clientSecret, username, paymentIntentI
     const handleConfirm = useCallback(async (_event: StripeExpressCheckoutElementConfirmEvent): Promise<void> => {
         if (!stripe || !elements) return;
 
+        // Validate the Express Checkout Element state
+        const { error: submitError } = await elements.submit();
+        if (submitError) {
+            setErrorMessage(submitError.message || 'Validation failed.');
+            return;
+        }
+
+        // Create PaymentIntent on the server (deferred intent pattern)
+        let clientSecret: string;
+        let paymentIntentId: string;
+        try {
+            const res = await createPaymentIntent(cost);
+            clientSecret = res.clientSecret;
+            paymentIntentId = res.paymentIntentId;
+        } catch (err: any) {
+            setErrorMessage(err.response?.data?.error || 'Failed to create payment.');
+            return;
+        }
+
+        // Confirm the payment with Stripe
         const { error } = await stripe.confirmPayment({
             elements,
             clientSecret,
@@ -39,12 +59,12 @@ export default function ExpressCheckout({ clientSecret, username, paymentIntentI
             } else {
                 payOrder(auth.username, paymentIntentId).then(() => {
                     window.location.href = '/paymentCompleted';
-                }).catch((err) => {
+                }).catch((err: any) => {
                     setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                 });
             }
         }
-    }, [stripe, elements, clientSecret, username, auth.username, paymentIntentId]);
+    }, [stripe, elements, cost, username, auth.username]);
 
     return (
         <div>
@@ -55,9 +75,8 @@ export default function ExpressCheckout({ clientSecret, username, paymentIntentI
                         googlePay: 'always',
                         applePay: 'always',
                         link: 'auto',
-                        amazonPay: 'never',
                         klarna: 'never',
-                        paypal: 'auto',
+                        amazonPay: 'never',
                     },
                 }}
             />

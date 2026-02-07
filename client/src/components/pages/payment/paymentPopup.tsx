@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { createPaymentIntent } from './paymentAPI';
+import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import ExpressCheckout from './expressCheckout';
 import CardPaymentForm from './cardPaymentForm';
 
@@ -10,45 +9,56 @@ interface params {
     cost: number,
     username: string,
 };
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
+
+const appearance: Appearance = {
+    theme: 'night',
+    variables: {
+        colorPrimary: '#ffffff',
+        fontFamily: '"Mulish", sans-serif',
+        colorBackground: 'rgba(30, 34, 44, 0.85)',
+        colorText: '#ffffff',
+        colorTextPlaceholder: '#aab7c4',
+        colorDanger: '#fa755a',
+        borderRadius: '8px',
+    },
+    rules: {
+        '.Input': {
+            border: '1.5px solid #fff',
+        },
+    },
+};
 
 export default function PaymentPopup({cost, username}:params):React.ReactElement {
 
-    const [clientSecret, setClientSecret] = useState<string>('');
-    const [paymentIntentId, setPaymentIntentId] = useState<string>('');
+    const amountInPence = Math.round(cost * 100);
 
+    const elementsOptions = {
+        mode: 'payment' as const,
+        amount: amountInPence,
+        currency: 'gbp',
+        appearance,
+        payment_method_types: ['card', 'link'],
+    };
 
-    //get the client secret and payment intent ID
-    useEffect(() => {
-        createPaymentIntent(cost).then((res) => {
-          setClientSecret(res.clientSecret);
-          setPaymentIntentId(res.paymentIntentId);
-        });
-    }, [cost]);
+    return (
+        <div className="popupWrapper" id="paymentPopupWrapper">
+            <h2>
+                {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
+            </h2>
+            <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
 
-    if (!clientSecret) {
-        return (
-            <div className="popupWrapper" id="paymentPopupWrapper">
-                <h2>Loading payment...</h2>
-            </div>
-        );
-    }
+            <Elements stripe={stripePromise} options={elementsOptions}>
+                <ExpressCheckout cost={cost} username={username} />
+            </Elements>
 
-  return (
-    <div className="popupWrapper" id="paymentPopupWrapper">
-      <React.Fragment>
-        <h2>
-          {username === 'NO_NAME' ? 'Donate!' : `Get your food, ${username}!`}
-        </h2>
-        <div className="dividerLine" style={{marginTop: '20px', marginBottom: '30px'}}></div>
+            <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
+            <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with:</p>
 
-        <Elements stripe={stripePromise} options={{clientSecret}}>
-          <ExpressCheckout clientSecret={clientSecret} username={username} paymentIntentId={paymentIntentId} />
-          <div className="dividerLine" style={{marginTop: '20px', marginBottom: '20px'}}></div>
-          <p style={{textAlign: 'center', marginBottom: '0'}}>Or pay with card:</p>
-          <CardPaymentForm clientSecret={clientSecret} username={username} paymentIntentId={paymentIntentId} />
-        </Elements>
-      </React.Fragment>
-    </div>
-  );
+            <Elements stripe={stripePromise} options={elementsOptions}>
+                <CardPaymentForm cost={cost} username={username} />
+            </Elements>
+        </div>
+    );
 };

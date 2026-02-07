@@ -51,9 +51,7 @@ router.post('/createPaymentIntent', requireAuth, async (req, res) => {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(cost * 100), // Stripe expects amount in pence/cents
             currency: 'gbp',
-            automatic_payment_methods: {
-                enabled: true,
-            },
+            payment_method_types: ['card', 'link'],
             metadata: {
                 username: username, // Associate payment with user
             },
