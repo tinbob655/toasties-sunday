@@ -95,5 +95,4 @@ toasties-sunday/
 ```
 
 ## License
-
-MIT
+MIT (probably)
