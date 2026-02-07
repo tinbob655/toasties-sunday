@@ -1,6 +1,9 @@
 //load environment variables FIRST
 require('dotenv').config();
 
+// Define environment flags early
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Validate critical environment variables
 const requiredEnvVars = ['SESSION_SECRET', 'STRIPE_SK'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -20,7 +23,6 @@ if (process.env.SESSION_SECRET.length < 32) {
 //ensure database tables are created
 const sequelize = require('./sequelize');
 const SequelizeStore = require('connect-session-sequelize')(require('express-session').Store);
-const isProduction = process.env.NODE_ENV === 'production';
 
 //in production, use force: false to avoid schema changes. Use migrations for production schema updates.
 sequelize.sync({ alter: !isProduction }).then(() => {

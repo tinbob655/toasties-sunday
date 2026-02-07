@@ -1,11 +1,5 @@
 //for routes which require users to be authenticated
-
-//validate username format
-function validateUsername(username) {
-    // Username must be 3-30 characters, alphanumeric with underscores and hyphens
-    const regex = /^[a-zA-Z0-9_-]{3,30}$/;
-    return ((typeof username === 'string') && (regex.test(username)));
-}
+const { validateUsername } = require('../utils/validation');
 
 //the user must be logged in
 function requireAuth(req, res, next) {
