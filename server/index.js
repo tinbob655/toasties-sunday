@@ -35,6 +35,50 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
+
+// Stripe webhook needs raw body - must be BEFORE body parsers
+const stripe = require('stripe')(process.env.STRIPE_SK);
+app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  if (!webhookSecret) {
+    console.warn('STRIPE_WEBHOOK_SECRET not configured');
+    return res.status(200).json({ received: true });
+  }
+  
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    const username = paymentIntent.metadata.username;
+    
+    if (username && username !== 'NO_NAME') {
+      try {
+        const { Sequelize, DataTypes, Model } = require('sequelize');
+        const sequelize = require('./sequelize');
+        
+        // Get the Purchase model (defined in purchase.js)
+        const [results] = await sequelize.query(
+          'UPDATE purchases SET paid = true WHERE username = ? AND paid = false',
+          { replacements: [username] }
+        );
+        console.log(`Webhook: Order marked as paid for ${username}`);
+      } catch (err) {
+        console.error('Webhook: Error updating order:', err);
+      }
+    }
+  }
+  
+  res.status(200).json({ received: true });
+});
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(express.json());

@@ -13,3 +13,9 @@ export async function createPaymentIntent(cost: number):Promise<PaymentIntentRes
         paymentIntentId: res.paymentIntentId
     };
 };
+
+//complete payment after Stripe redirect (marks order as paid)
+export async function completePaymentAfterRedirect(paymentIntentId: string): Promise<{message: string, order?: any}> {
+    const res = (await axios.post('/api/payment/completePayment', { paymentIntentId })).data;
+    return res;
+};
