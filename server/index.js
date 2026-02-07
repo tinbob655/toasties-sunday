@@ -55,6 +55,13 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8080'];
 
+// Security check: wildcard with credentials is insecure
+if (allowedOrigins.includes('*')) {
+  console.error('SECURITY WARNING: ALLOWED_ORIGINS contains "*" which is insecure with credentials enabled.');
+  console.error('Remove "*" from ALLOWED_ORIGINS and specify exact origins, or disable credentials.');
+  process.exit(1);
+}
+
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -65,7 +72,7 @@ app.use(cors({
       return callback(null, true);
     }
     
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
     
