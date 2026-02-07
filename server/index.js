@@ -1,6 +1,22 @@
 //load environment variables FIRST
 require('dotenv').config();
 
+// Validate critical environment variables
+const requiredEnvVars = ['SESSION_SECRET', 'STRIPE_SK'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`CRITICAL: Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  console.error('Application cannot start securely without these variables.');
+  process.exit(1);
+}
+
+// Validate SESSION_SECRET strength
+if (process.env.SESSION_SECRET.length < 32) {
+  console.error('CRITICAL: SESSION_SECRET must be at least 32 characters long for security.');
+  process.exit(1);
+}
+
 //ensure database tables are created
 const sequelize = require('./sequelize');
 const SequelizeStore = require('connect-session-sequelize')(require('express-session').Store);
@@ -31,8 +47,29 @@ const bodyParser = require('body-parser');
 
 //trust first proxy (needed for secure cookies behind reverse proxies)
 app.set('trust proxy', 1);
+
+// Configure CORS with specific allowed origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8080'];
+
 app.use(cors({
-  origin: true,
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1 && !isProduction) {
+      // In development, allow all origins
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
   credentials: true
 }));
 
@@ -64,10 +101,13 @@ app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), asyn
         const { Sequelize, DataTypes, Model } = require('sequelize');
         const sequelize = require('./sequelize');
         
-        // Get the Purchase model (defined in purchase.js)
+        // Use parameterized query with Sequelize's QueryTypes to prevent SQL injection
         const [results] = await sequelize.query(
-          'UPDATE purchases SET paid = true WHERE username = ? AND paid = false',
-          { replacements: [username] }
+          'UPDATE purchases SET paid = :paid WHERE username = :username AND paid = false',
+          { 
+            replacements: { paid: true, username: username },
+            type: Sequelize.QueryTypes.UPDATE
+          }
         );
         console.log(`Webhook: Order marked as paid for ${username}`);
       } catch (err) {

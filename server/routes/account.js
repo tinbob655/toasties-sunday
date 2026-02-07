@@ -36,6 +36,13 @@ router.post('/createAccount', authLimiter, upload.none(), async (req, res) => {
          return res.status(400).json({message: "Did not receive either a username or password"});
     };
 
+    // Validate username format (alphanumeric, underscores, hyphens only, 3-30 chars)
+    if (!validateUsername(username)) {
+        return res.status(400).json({
+            message: "Invalid username format. Must be 3-30 characters and contain only letters, numbers, underscores, or hyphens."
+        });
+    }
+
     //make sure the username provided is unique
     try {
         const duplicates = await Account.findAll({where: {username: username}});
@@ -80,6 +87,11 @@ router.post('/login', authLimiter, async (req, res) => {
         return res.status(400).json({message: "Did not receive either a username or a password"});
     };
 
+    // Validate username format to prevent injection
+    if (!validateUsername(username)) {
+        return res.status(401).json({message: "Invalid credentials"});
+    }
+
     const user = await Account.findOne({where: {username}});
 
     if (!user) {
@@ -111,11 +123,23 @@ router.post('/usernameExists', async (req, res) => {
     if (!username) {
         return res.status(400).json({ exists: false, message: "No username provided" });
     };
+    
+    // Validate username format to prevent injection
+    if (!validateUsername(username)) {
+        return res.status(400).json({ exists: false, message: "Invalid username format" });
+    }
+    
     const user = await Account.findOne({ where: { username } });
     res.json({ exists: !!user });
 });
 
 //note: sudo check is handled client-side via VITE_SUDO_USERS env var to avoid unnecessary API calls
+
+function validateUsername(username) {
+    // Username must be 3-30 characters, alphanumeric with underscores and hyphens
+    const regex = /^[a-zA-Z0-9_-]{3,30}$/;
+    return ((typeof username === 'string') && (regex.test(username)));
+}
 
 function validatePassword(password) {
 
