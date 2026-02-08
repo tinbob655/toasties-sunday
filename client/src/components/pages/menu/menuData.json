@@ -11,7 +11,7 @@
             },
             {
                 "name": "Turkey (Halal)",
-                "cost": 0.31
+                "cost": 0.39
             },
             {
                 "name": "Spring onions",
@@ -23,11 +23,11 @@
             },
             {
                 "name": "Marmite",
-                "cost": 0.02
+                "cost": 0.08
             },
             {
                 "name": "Herbs",
-                "cost": 0.01
+                "cost": 0.06
             }
         ]
     },
@@ -65,7 +65,7 @@
             },
             {
                 "name": "Banana",
-                "cost": 0.09
+                "cost": 0.19
             },
             {
                 "name": "Sugar",
