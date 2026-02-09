@@ -42,7 +42,7 @@ export default function Support():React.ReactElement {
                     Donate
                 </h2>
                 <p className="alignRight">
-                    Donate. Why? Because every time you do Henry gets fed and Will gets let out his cage. Your donation might even come with a free high-five from our mascot, Ted the Toaster! Also, failure to donate will result in an unsavoury visit from our enforcement agent (Tomik) and yes, he will bring his spoons.
+                    Donate now or face the music.
                 </p>
 
                 <FancyButton text="Donate here!" transformOrigin="left" action={() => {
