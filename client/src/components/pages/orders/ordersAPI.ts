@@ -6,6 +6,11 @@ export type EditableOrderObj = Omit<orderObj, 'paid'>;
 import menuData from '../menu/menuData.json' assert {type: "json"};
 
 
+//constants for order limits
+const LATEST_ORDER_TIME = 14;
+const EARLIEST_ORDER_TIME = 23;
+
+
 //get all the orders
 export async function getOrders():Promise<orderObj[]> {
     const res = (await axios.get('/api/db/order/getOrders')).data;
@@ -23,8 +28,8 @@ export async function getOrder(username: string): Promise<orderObj | null> {
 
             //username not found
             return null;
-        }
-        throw err; // Other errors
+        };
+        throw err;
     };
 };
 
@@ -34,9 +39,7 @@ export async function placeOrder(data: { username: string; cost: number; toastie
     //the user cannot make orders between 13:00 and 21:59 on a Sunday.
     const DISABLE_TIMECHECK = import.meta.env.VITE_DISABLE_ORDERS_TIMECHECK;
     const currentTime: Date = new Date();
-    const LATEST_TIME = 14;
-    const EARLIEST_TIME = 17;
-    if (DISABLE_TIMECHECK == 'false' && currentTime.getDay() === 0 && currentTime.getHours() >= LATEST_TIME && currentTime.getHours() < EARLIEST_TIME) {
+    if (DISABLE_TIMECHECK == 'false' && currentTime.getDay() === 0 && currentTime.getHours() >= LATEST_ORDER_TIME && currentTime.getHours() < EARLIEST_ORDER_TIME) {
 
         //invalid time to make an order
         throw new Error("Orders cannot be placed between 1:00 PM and 9:59 PM on Sundays.");

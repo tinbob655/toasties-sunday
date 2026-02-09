@@ -67,6 +67,12 @@ Purchase.init(
 );
 
 
+//helper: block order modifications between 2pm and 11pm on Sundays
+function isOrderBlocked() {
+  const now = new Date();
+  return now.getDay() === 0 && now.getHours() >= 14 && now.getHours() < 23;
+}
+
 //get all orders (with optional pagination) - ADMIN ONLY
 router.get('/getOrders', requireAdmin, async (req, res) => {
   try {
@@ -124,6 +130,11 @@ router.get('/getOrder/:username', requireOwnerOrAdmin('username'), async (req, r
 router.post('/createNewOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
 
+    //check if orders are blocked (2pm-11pm on Sundays)
+    if (isOrderBlocked()) {
+      return res.status(403).json({ error: 'Orders cannot be created between 2:00 PM and 11:00 PM on Sundays.' });
+    }
+
     //make sure we have a username
     const username = req.params.username;
     if (!username) {
@@ -158,6 +169,12 @@ router.post('/createNewOrder/:username', requireOwnerOrAdmin('username'), async 
 //delete an order based on username - owner or admin only
 router.delete('/deleteOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
+
+    //check if orders are blocked (2pm-11pm on Sundays)
+    if (isOrderBlocked()) {
+      return res.status(403).json({ error: 'Orders cannot be deleted between 2:00 PM and 11:00 PM on Sundays.' });
+    }
+
     const username = req.params.username;
 
     //make sure we got a username
@@ -201,6 +218,11 @@ router.delete('/deleteOrder/:username', requireOwnerOrAdmin('username'), async (
 //edit an order based on username - owner or admin only
 router.put('/editOrder/:username', requireOwnerOrAdmin('username'), async (req, res) => {
   try {
+
+    //check if orders are blocked (2pm-11pm on Sundays)
+    if (isOrderBlocked()) {
+      return res.status(403).json({ error: 'Orders cannot be edited between 2:00 PM and 11:00 PM on Sundays.' });
+    }
 
     //make sure we have a username
     const username = req.params.username;
