@@ -28,6 +28,14 @@
             {
                 "name": "Herbs",
                 "cost": 0.06
+            },
+            {
+                "name": "Jalapeños",
+                "cost": 0.53
+            },
+            {
+                "name": "Extra cheese",
+                "cost": 0.17
             }
         ]
     },
