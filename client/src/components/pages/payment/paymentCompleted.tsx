@@ -43,8 +43,15 @@ export default function PaymentCompleted():React.ReactElement {
                         setStatus('error');
                     }
                 });
+        } else if (redirectStatus && redirectStatus !== 'succeeded') {
+            // Payment was not successful
+            setErrorMessage('Payment was not completed successfully.');
+            setStatus('error');
+        } else if (!paymentIntent && !redirectStatus) {
+            // No payment info in URL - direct navigation without completing a payment
+            setErrorMessage('No payment information found. Please complete a payment first.');
+            setStatus('error');
         } else {
-            // No payment intent in URL - either direct navigation or non-redirect payment
             setStatus('success');
         }
     }, [searchParams, loggedIn, authLoading]);
