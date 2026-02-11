@@ -3,7 +3,7 @@ import type { orderObj } from "./orderObj";
 
 // Type for editing an order (no paid field)
 export type EditableOrderObj = Omit<orderObj, 'paid'>;
-import menuData from '../menu/menuData.json' assert {type: "json"};
+import menuData from '../../../../../shared/menuData.json';
 
 
 //constants for order limits
@@ -33,8 +33,8 @@ export async function getOrder(username: string): Promise<orderObj | null> {
     };
 };
 
-//place a new order
-export async function placeOrder(data: { username: string; cost: number; toasties: string[]; drinks: string[]; deserts: string[] }):Promise<orderObj> {
+//place a new order (cost is calculated server-side from items)
+export async function placeOrder(data: { username: string; toasties: string[]; drinks: string[]; deserts: string[] }):Promise<orderObj> {
 
     //the user cannot make orders between 13:00 and 21:59 on a Sunday.
     const DISABLE_TIMECHECK = import.meta.env.VITE_DISABLE_ORDERS_TIMECHECK;
@@ -47,8 +47,8 @@ export async function placeOrder(data: { username: string; cost: number; toastie
     else {
 
         //valid time to place an order, do so
-        const { cost, toasties, drinks, deserts } = data;
-        const res = (await axios.post(`/api/db/order/createNewOrder/${encodeURIComponent(data.username)}`, { cost, toasties, drinks, deserts })).data;
+        const { toasties, drinks, deserts } = data;
+        const res = (await axios.post(`/api/db/order/createNewOrder/${encodeURIComponent(data.username)}`, { toasties, drinks, deserts })).data;
         return res;
     };
 };
@@ -64,12 +64,12 @@ export async function deleteOrder(username: string):Promise<string> {
     };
 };
 
-//edit an order based on username
+//edit an order based on username (cost is calculated server-side from items)
 export async function editOrder(
-    data: { username: string; cost: number; toasties: string[]; drinks: string[]; deserts: string[] }
+    data: { username: string; toasties: string[]; drinks: string[]; deserts: string[] }
 ): Promise<orderObj> {
-    const {username, cost, toasties, drinks, deserts} = data;
-    const res = (await axios.put(`/api/db/order/editOrder/${encodeURIComponent(username)}`, {cost, toasties, drinks, deserts})).data;
+    const {username, toasties, drinks, deserts} = data;
+    const res = (await axios.put(`/api/db/order/editOrder/${encodeURIComponent(username)}`, {toasties, drinks, deserts})).data;
     return res;
 };
 

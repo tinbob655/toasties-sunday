@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import menuData from '../../menu/menuData.json' assert {type: "json"};
+import menuData from '../../../../../../shared/menuData.json';
 import OrderCheckboxes from './orderCheckboxes';
 import Popup from '../../../multiPageComponents/popup';
 

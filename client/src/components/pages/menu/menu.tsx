@@ -1,6 +1,6 @@
 import React from 'react';
 import PageHeader from '../../multiPageComponents/pageHeader';
-import menuData from './menuData.json' assert { type: "json" };
+import menuData from '../../../../../shared/menuData.json';
 import type { courseObj } from './courseObj';
 import SingleCourseMenu from './singleCourseMenu';
 
