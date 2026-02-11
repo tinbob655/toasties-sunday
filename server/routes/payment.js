@@ -58,6 +58,11 @@ router.post('/createPaymentIntent', requireAuth, async (req, res) => {
         if (!cost || cost <= 0 || cost > 100) {
             return res.status(400).json({error: `Invalid cost: ${cost}`});
         };
+
+        //enforce minimum donation amount (Stripe minimum for GBP is £0.30, we require £0.50)
+        if (isDonation && cost < 0.50) {
+            return res.status(400).json({error: 'Minimum donation amount is £0.50'});
+        };
     
         //we have a valid cost, create a PaymentIntent with metadata
         const paymentIntent = await stripe.paymentIntents.create({
@@ -65,7 +70,8 @@ router.post('/createPaymentIntent', requireAuth, async (req, res) => {
             currency: 'gbp',
             payment_method_types: ['card', 'link'],
             metadata: {
-                username: username, // Associate payment with user
+                username: isDonation ? 'NO_NAME' : username, // Donations must not be associated with a real user
+                type: isDonation ? 'donation' : 'order', // Distinguish donation from order payments
             },
         });
     
