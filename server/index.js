@@ -58,13 +58,37 @@ app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), asyn
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object;
     const username = paymentIntent.metadata.username;
+    const paymentType = paymentIntent.metadata.type;
+    
+    // Only process order payments, not donations
+    if (paymentType !== 'order') {
+      console.log(`Webhook: Skipping non-order payment (type: ${paymentType}) for ${username}`);
+      return res.status(200).json({ received: true });
+    }
     
     if (username && username !== 'NO_NAME') {
       try {
         const { Sequelize, DataTypes, Model } = require('sequelize');
         const sequelize = require('./sequelize');
         
-        // Get the Purchase model (defined in purchase.js)
+        // Verify payment amount matches order cost before marking as paid
+        const paidAmountPence = paymentIntent.amount;
+        const [orders] = await sequelize.query(
+          'SELECT cost FROM purchases WHERE username = ? AND paid = false',
+          { replacements: [username] }
+        );
+        
+        if (orders.length === 0) {
+          console.log(`Webhook: No unpaid order found for ${username}`);
+          return res.status(200).json({ received: true });
+        }
+        
+        const orderCostPence = Math.round(parseFloat(orders[0].cost) * 100);
+        if (Math.abs(paidAmountPence - orderCostPence) > 1) {
+          console.error(`Webhook: Payment amount (${paidAmountPence}p) does not match order cost (${orderCostPence}p) for ${username}`);
+          return res.status(200).json({ received: true });
+        }
+        
         const [results] = await sequelize.query(
           'UPDATE purchases SET paid = true WHERE username = ? AND paid = false',
           { replacements: [username] }
