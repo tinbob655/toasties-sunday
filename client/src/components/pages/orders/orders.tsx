@@ -35,13 +35,16 @@ export default function Orders():React.ReactElement {
     async function orderFormSubmitted(event: React.FormEvent, setErrorMsg: (msg: string) => void) {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
-        const cost = extractCost(form, setErrorMsg);
+
+        //validate that at least one category is selected (cost is calculated server-side)
+        const validationCost = extractCost(form, setErrorMsg);
+        if (validationCost === -1) return;
+
         const { toasties, drinks, deserts } = extractOrderItems(form);
 
         //place the order
         try {
             const res = await placeOrder({
-                cost: cost,
                 username: username,
                 toasties,
                 drinks,
@@ -94,13 +97,16 @@ export default function Orders():React.ReactElement {
     async function changeOrder(event: React.FormEvent, setErrorMsg: Function) {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
-        const cost = extractCost(form, setErrorMsg);
+
+        //validate that at least one category is selected (cost is calculated server-side)
+        const validationCost = extractCost(form, setErrorMsg);
+        if (validationCost === -1) return;
+
         const {toasties, drinks, deserts} = extractOrderItems(form);
 
         //edit the order
         try {
             const res = await editOrder({
-                cost: cost,
                 username: username,
                 toasties,
                 drinks,

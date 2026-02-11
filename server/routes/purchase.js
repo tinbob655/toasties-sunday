@@ -3,6 +3,7 @@ const sequelize = require('../sequelize');
 const express = require('express');
 const router = express.Router();
 const { requireAuth, requireOwnerOrAdmin, requireAdmin } = require('../middleware/auth');
+const menuData = require('../../shared/menuData.json');
 
 class Purchase extends Model {}
 Purchase.init(
@@ -73,6 +74,81 @@ function isOrderBlocked() {
   return now.getDay() === 0 && now.getHours() >= 14 && now.getHours() < 23;
 }
 
+
+//helper: build a Set of valid extra names for a menu category
+function validExtrasSet(extras) {
+  return new Set(extras.map(e => e.name));
+}
+
+//helper: build a cost lookup map for a menu category's extras
+function extrasCostMap(extras) {
+  const map = {};
+  extras.forEach(e => { map[e.name] = e.cost; });
+  return map;
+}
+
+//validate that all items in the order exist in the menu
+function validateOrderItems(toasties, drinks, deserts) {
+  const validToastyExtras = validExtrasSet(menuData.mainCourse.extras);
+  const validDrinkExtras = validExtrasSet(menuData.drinks.extras);
+  const validDesertExtras = validExtrasSet(menuData.desert.extras);
+
+  for (const item of toasties) {
+    if (item !== 'NEW TOASTY' && !validToastyExtras.has(item)) {
+      return `Invalid toasty item: ${item}`;
+    }
+  }
+  for (const item of drinks) {
+    if (!validDrinkExtras.has(item)) {
+      return `Invalid drink item: ${item}`;
+    }
+  }
+  for (const item of deserts) {
+    if (item !== 'NEW DESERT' && !validDesertExtras.has(item)) {
+      return `Invalid desert item: ${item}`;
+    }
+  }
+  return null; // valid
+}
+
+//calculate cost from ordered items using server-side menu data
+function calculateOrderCost(toasties, drinks, deserts) {
+  const toastyCosts = extrasCostMap(menuData.mainCourse.extras);
+  const drinkCosts = extrasCostMap(menuData.drinks.extras);
+  const desertCosts = extrasCostMap(menuData.desert.extras);
+
+  let cost = 0;
+
+  // Toasties: each "NEW TOASTY" marker = base cost, other items are extras
+  for (const item of toasties) {
+    if (item === 'NEW TOASTY') {
+      cost += Number(menuData.mainCourse.base.baseCost);
+    } else if (toastyCosts[item] !== undefined) {
+      cost += toastyCosts[item];
+    }
+  }
+
+  // Drinks: no markers, each item is a drink. baseCost only if > 0
+  const drinkBaseCost = Number(menuData.drinks.base.baseCost) > 0 ? Number(menuData.drinks.base.baseCost) : 0;
+  for (const item of drinks) {
+    cost += drinkBaseCost;
+    if (drinkCosts[item] !== undefined) {
+      cost += drinkCosts[item];
+    }
+  }
+
+  // Deserts: each "NEW DESERT" marker = base cost, other items are extras
+  for (const item of deserts) {
+    if (item === 'NEW DESERT') {
+      cost += Number(menuData.desert.base.baseCost);
+    } else if (desertCosts[item] !== undefined) {
+      cost += desertCosts[item];
+    }
+  }
+
+  return Math.round(cost * 100) / 100;
+}
+
 //get all orders (with optional pagination) - ADMIN ONLY
 router.get('/getOrders', requireAdmin, async (req, res) => {
   try {
@@ -141,15 +217,24 @@ router.post('/createNewOrder/:username', requireOwnerOrAdmin('username'), async 
       return res.status(400).json({error: "Did not receive a username to place the order with"});
     };
 
-    //if the cost is 0 or too large, terminate
-    const cost = req.body.cost;
+    //validate and calculate cost server-side
+    const { toasties, drinks, deserts } = req.body;
+    if ((!toasties || !toasties.length) && (!drinks || !drinks.length) && (!deserts || !deserts.length)) {
+      return res.status(400).json({error: "You must order at least one item"});
+    }
+
+    const validationError = validateOrderItems(toasties || [], drinks || [], deserts || []);
+    if (validationError) {
+      return res.status(400).json({error: validationError});
+    }
+
+    const cost = calculateOrderCost(toasties || [], drinks || [], deserts || []);
     if (cost <= 0 || cost > 100) {
-      return res.status(400).json({error: "A cost cannot be 0 or less"});
+      return res.status(400).json({error: "Calculated cost is invalid"});
     };
 
     //create the order
-    const { toasties, drinks, deserts } = req.body;
-    console.log(toasties, drinks, deserts);
+    console.log(toasties, drinks, deserts, `(cost: £${cost})`);
     const newOrder = await Purchase.create({
       username,
       cost,
@@ -229,14 +314,21 @@ router.put('/editOrder/:username', requireOwnerOrAdmin('username'), async (req, 
     if (!username) {
       return res.status(400).json({error: "Did not receive a username"});
     };
-  
-    //make sure we got given a new cost
-    const newCost = req.body.cost;
-    if (!newCost) {
-      return res.status(400).json({error: "Did not receive a cost"});
+
+    //validate and calculate cost server-side
+    const { toasties, drinks, deserts } = req.body;
+    if ((!toasties || !toasties.length) && (!drinks || !drinks.length) && (!deserts || !deserts.length)) {
+      return res.status(400).json({error: "You must order at least one item"});
     }
-    else if (newCost <= 0 || newCost > 100) {
-      return res.status(400).json({error: `Invalid cost: ${newCost}`});
+
+    const validationError = validateOrderItems(toasties || [], drinks || [], deserts || []);
+    if (validationError) {
+      return res.status(400).json({error: validationError});
+    }
+
+    const newCost = calculateOrderCost(toasties || [], drinks || [], deserts || []);
+    if (newCost <= 0 || newCost > 100) {
+      return res.status(400).json({error: "Calculated cost is invalid"});
     };
   
     //get the old order

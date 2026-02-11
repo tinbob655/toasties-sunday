@@ -38,10 +38,14 @@ export default function CardPaymentForm({ cost, username }: params): React.React
         }
 
         // Create PaymentIntent on the server (deferred intent pattern)
+        // For orders, cost is looked up server-side; for donations, send cost
         let clientSecret: string;
         let paymentIntentId: string;
         try {
-            const res = await createPaymentIntent(cost);
+            const isDonation = username === 'NO_NAME';
+            const res = await createPaymentIntent(
+                isDonation ? { cost, isDonation: true } : undefined
+            );
             clientSecret = res.clientSecret;
             paymentIntentId = res.paymentIntentId;
         } catch (err: any) {

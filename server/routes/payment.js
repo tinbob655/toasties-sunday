@@ -36,14 +36,26 @@ Purchase.init(
 router.post('/createPaymentIntent', requireAuth, async (req, res) => {
     try {
     
-        //make sure we have a valid price to charge
-        const cost = req.body.cost;
         const username = req.session.user.username;
-        
-        if (!cost) {
-            return res.status(400).json({error: "Did not receive a cost to charge"});
+        const isDonation = req.body.isDonation === true;
+        let cost;
+
+        if (isDonation) {
+            //for donations, accept cost from request body
+            cost = req.body.cost;
+        } else {
+            //for orders, look up cost from the database (never trust the client)
+            const order = await Purchase.findByPk(username);
+            if (!order) {
+                return res.status(404).json({error: "No order found for this user"});
+            }
+            if (order.paid) {
+                return res.status(400).json({error: "This order has already been paid"});
+            }
+            cost = parseFloat(order.cost);
         }
-        else if (cost <= 0 || cost > 100) {
+
+        if (!cost || cost <= 0 || cost > 100) {
             return res.status(400).json({error: `Invalid cost: ${cost}`});
         };
     

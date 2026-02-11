@@ -5,9 +5,11 @@ export interface PaymentIntentResponse {
     paymentIntentId: string;
 }
 
-//create a payment intent for Apple/Google Pay
-export async function createPaymentIntent(cost: number):Promise<PaymentIntentResponse> {
-    const res = (await axios.post('/api/payment/createPaymentIntent', {cost: cost})).data;
+//create a payment intent
+//for orders: cost is looked up server-side from the user's order
+//for donations: cost is provided by the client
+export async function createPaymentIntent(options?: { cost?: number, isDonation?: boolean }):Promise<PaymentIntentResponse> {
+    const res = (await axios.post('/api/payment/createPaymentIntent', options ?? {})).data;
     return {
         clientSecret: res.clientSecret,
         paymentIntentId: res.paymentIntentId
