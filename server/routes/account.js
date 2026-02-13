@@ -43,6 +43,11 @@ router.post('/createAccount', authLimiter, upload.none(), async (req, res) => {
             return res.status(409).json({message: "An account with that username already exists"});
         };
 
+        //username cannot be "NO_NAME"
+        if (username === "NO_NAME") {
+            return res.status(400).json({message: "Stop tying to hack the website."});
+        };
+
         //validate password
         if (!validatePassword(password)) {
 
