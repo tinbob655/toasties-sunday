@@ -152,6 +152,13 @@ router.post('/completePayment', requireAuth, async (req, res) => {
         // Get the username from payment metadata
         const orderUsername = paymentIntent.metadata.username;
         
+        // If this is a donation, no order to mark as paid
+        if (paymentIntent.metadata.type === 'donation') {
+            return res.status(200).json({ 
+                message: 'Donation payment completed'
+            });
+        }
+        
         // Verify the payment belongs to the logged-in user
         if (orderUsername !== sessionUsername) {
             return res.status(403).json({ 

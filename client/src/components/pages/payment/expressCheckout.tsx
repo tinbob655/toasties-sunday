@@ -57,12 +57,13 @@ export default function ExpressCheckout({ cost, username }: params): React.React
         if (error) {
             setErrorMessage(error.message || 'Payment failed.');
         } else {
+            const successUrl = `/paymentCompleted?payment_intent=${paymentIntentId}&redirect_status=succeeded`;
             // Skip database update for anonymous users
             if (username === 'NO_NAME') {
-                window.location.href = '/paymentCompleted';
+                window.location.href = successUrl;
             } else {
                 payOrder(auth.username, paymentIntentId).then(() => {
-                    window.location.href = '/paymentCompleted';
+                    window.location.href = successUrl;
                 }).catch((err: any) => {
                     setErrorMessage(err.response?.data?.error || 'Failed to verify payment.');
                 });
