@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
+const {DataTypes, Model } = require('sequelize');
 const sequelize = require('../sequelize');
 const express = require('express');
 const router = express.Router();
-const { requireAuth, requireOwnerOrAdmin, requireAdmin } = require('../middleware/auth');
+const {requireOwnerOrAdmin, requireAdmin } = require('../middleware/auth');
 const menuData = require('../../shared/menuData.json');
 
 class Purchase extends Model {}
@@ -159,6 +159,18 @@ router.get('/getOrders', requireAdmin, async (req, res) => {
     //if no pagination params provided, return all (backwards compatible)
     if (!req.query.page && !req.query.limit) {
       const orders = await Purchase.findAll();
+
+      //recalculate cost for unpaid orders from current menu prices
+      for (const order of orders) {
+        if (!order.paid) {
+          const recalculatedCost = calculateOrderCost(order.toasties || [], order.drinks || [], order.deserts || []);
+          if (recalculatedCost !== parseFloat(order.cost)) {
+            order.cost = recalculatedCost;
+            await order.save();
+          }
+        }
+      }
+
       return res.status(200).json(orders);
     }
 
@@ -167,6 +179,17 @@ router.get('/getOrders', requireAdmin, async (req, res) => {
       offset,
       order: [['createdAt', 'DESC']],
     });
+
+    //recalculate cost for unpaid orders from current menu prices
+    for (const order of orders) {
+      if (!order.paid) {
+        const recalculatedCost = calculateOrderCost(order.toasties || [], order.drinks || [], order.deserts || []);
+        if (recalculatedCost !== parseFloat(order.cost)) {
+          order.cost = recalculatedCost;
+          await order.save();
+        }
+      }
+    }
 
     return res.status(200).json({
       orders,
@@ -193,6 +216,15 @@ router.get('/getOrder/:username', requireOwnerOrAdmin('username'), async (req, r
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     };
+
+    //recalculate cost from current menu prices if unpaid
+    if (!order.paid) {
+      const recalculatedCost = calculateOrderCost(order.toasties || [], order.drinks || [], order.deserts || []);
+      if (recalculatedCost !== parseFloat(order.cost)) {
+        order.cost = recalculatedCost;
+        await order.save();
+      }
+    }
 
     return res.status(200).json(order);
   }
@@ -425,3 +457,5 @@ router.put('/payOrder/:username', requireOwnerOrAdmin('username'), async (req, r
 });
 
 module.exports = router;
+module.exports.calculateOrderCost = calculateOrderCost;
+module.exports.Purchase = Purchase;

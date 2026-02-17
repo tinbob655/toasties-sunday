@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { requireAuth, requireOwnerOrAdmin } = require('../middleware/auth');
+const { requireAuth} = require('../middleware/auth');
 const stripe = require('stripe')(process.env.STRIPE_SK);
-const { Sequelize, DataTypes, Model } = require('sequelize');
+const {DataTypes, Model } = require('sequelize');
 const sequelize = require('../sequelize');
+const { calculateOrderCost } = require('./purchase');
 
 // Import or define Purchase model (same as in purchase.js)
 class Purchase extends Model {}
@@ -52,7 +53,13 @@ router.post('/createPaymentIntent', requireAuth, async (req, res) => {
             if (order.paid) {
                 return res.status(400).json({error: "This order has already been paid"});
             }
-            cost = parseFloat(order.cost);
+
+            //recalculate cost from current menu prices
+            cost = calculateOrderCost(order.toasties || [], order.drinks || [], order.deserts || []);
+            if (cost !== parseFloat(order.cost)) {
+                order.cost = cost;
+                await order.save();
+            }
         }
 
         if (!cost || cost <= 0 || cost > 100) {
